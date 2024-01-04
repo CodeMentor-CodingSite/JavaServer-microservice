@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @GetMapping("/api/apigateway/test")
     public String test() {
-        return "This is apigateway service!";
+        return "This is apigateway service!!";
     }
 }
