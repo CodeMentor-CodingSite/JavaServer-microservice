@@ -3,7 +3,8 @@ on:
   push:
     branches:
       - main
-      - cicd-execute
+    paths:
+      - 'execute/**'
 
 permissions:
   contents: read

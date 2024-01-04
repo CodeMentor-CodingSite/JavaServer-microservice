@@ -3,7 +3,8 @@ on:
   push:
     branches:
       - main
-      - cicd-apigateway
+    paths:
+      - 'apigateway/**'
 
 permissions:
   contents: read

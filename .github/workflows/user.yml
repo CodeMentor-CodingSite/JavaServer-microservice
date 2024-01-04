@@ -3,7 +3,8 @@ on:
   push:
     branches: 
       - main
-      - cicd-user
+    paths:
+      - 'user/**'
 
 permissions:
   contents: read

@@ -3,7 +3,8 @@ on:
   push:
     branches: 
       - main
-      - cicd-question
+    paths:
+      - 'question/**'
 
 permissions:
   contents: read
