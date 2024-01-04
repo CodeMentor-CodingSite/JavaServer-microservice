@@ -2,6 +2,7 @@ name: apigateway
 on:
   push:
     branches: [ main ]
+    branches: [ cicd-apigateway ]
 
 permissions:
   contents: read
@@ -39,3 +40,18 @@ jobs:
 
       - name: Docker Hub Push
         run: docker push lkh66913/codementor-apigateway
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Configure kubectl
+        run: |
+          gcloud container clusters get-credentials codementor-cluster --zone us-central1-c --project invertible-spot-410007
+
+      - name: Deploy to GKE
+        run: |
+          kubectl set image deployment/codementor-apigateway-deployment codementor-apigateway=lkh66913/codementor-apigateway:latest -n springboot
