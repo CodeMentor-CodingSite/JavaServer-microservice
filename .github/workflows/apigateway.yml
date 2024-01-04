@@ -50,7 +50,7 @@ jobs:
           export_default_credentials: true
 
       - name: Authenticate with gcloud
-        run: gcloud auth login
+        run: gcloud auth login --quite
 
       - name: Configure kubectl
         run: |
