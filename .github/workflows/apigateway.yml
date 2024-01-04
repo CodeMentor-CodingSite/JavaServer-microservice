@@ -1,8 +1,9 @@
 name: apigateway
 on:
   push:
-    branches: [ main ]
-    branches: [ cicd-apigateway ]
+    branches:
+      - main
+      - cicd-apigateway
 
 permissions:
   contents: read
