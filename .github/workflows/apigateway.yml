@@ -2,6 +2,7 @@ name: apigateway
 on:
   push:
     branches:
+      - main
       - cicd-apigateway
 
 permissions:
