@@ -43,11 +43,12 @@ jobs:
         run: docker push lkh66913/codementor-apigateway
 
       - id: 'auth'
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: ${{ secrets.GKE_SA_KEY }}
 
-      - uses: google-github-actions/get-gke-credentials@v0
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
