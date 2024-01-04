@@ -1,7 +1,7 @@
 name: question
 on:
   push:
-    branches: [ main ]
+    branches: [ cicd-question ]
 
 permissions:
   contents: read

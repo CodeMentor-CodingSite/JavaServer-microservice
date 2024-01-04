@@ -1,7 +1,7 @@
 name: execute
 on:
   push:
-    branches: [ main ]
+    branches: [ cicd-execute ]
 
 permissions:
   contents: read

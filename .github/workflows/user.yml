@@ -1,7 +1,7 @@
 name: user
 on:
   push:
-    branches: [ main ]
+    branches: [ cicd-user ]
 
 permissions:
   contents: read
