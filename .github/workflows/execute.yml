@@ -1,7 +1,9 @@
 name: execute
 on:
   push:
-    branches: [ cicd-execute ]
+    branches:
+      - main
+      - cicd-execute
 
 permissions:
   contents: read
@@ -39,3 +41,18 @@ jobs:
 
       - name: Docker Hub Push
         run: docker push lkh66913/codementor-execute
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: ${{ secrets.GKE_SA_KEY }}
+
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          
+      - name: Deploy to GKE
+        run: |
+          kubectl set image deployment/codementor-execute-deployment codementor-execute=lkh66913/codementor-execute:latest -n springboot

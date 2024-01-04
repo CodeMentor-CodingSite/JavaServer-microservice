@@ -1,7 +1,9 @@
 name: question
 on:
   push:
-    branches: [ cicd-question ]
+    branches: 
+      - main
+      - cicd-question
 
 permissions:
   contents: read
@@ -39,3 +41,18 @@ jobs:
 
       - name: Docker Hub Push
         run: docker push lkh66913/codementor-question
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: ${{ secrets.GKE_SA_KEY }}
+
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          
+      - name: Deploy to GKE
+        run: |
+          kubectl set image deployment/codementor-question-deployment codementor-question=lkh66913/codementor-question:latest -n springboot
