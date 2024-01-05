@@ -19,6 +19,14 @@ jobs:
       # checkout 설명 https://www.daleseo.com/github-actions-checkout/
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Create default application.yml
+        run: |
+          mkdir -p ${{env.working-directory}}/src/main/resources
+          touch ${{env.working-directory}}/src/main/resources/application.yml
+          
+          echo "${{ vars.QUESTION_APPLICATION_YML }}" >> ${{env.working-directory}}/src/main/resources/application.yml
+        shell: bash
         
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
