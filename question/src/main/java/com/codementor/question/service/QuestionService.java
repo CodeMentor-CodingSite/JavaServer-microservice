@@ -16,7 +16,6 @@ import java.util.ArrayList;
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
-
     private final QuestionRepository questionRepository;
     private final LanguageRepository languageRepository;
     private final QuestionLanguageRepository questionLanguageRepository;
