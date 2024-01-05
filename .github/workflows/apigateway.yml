@@ -19,6 +19,10 @@ jobs:
       # checkout 설명 https://www.daleseo.com/github-actions-checkout/
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Get current timestamp
+        id: timestamp
+        run: echo "::set-output name=timestamp::$(date '+%Y%m%d%H%M%S%3N')"
         
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -31,7 +35,7 @@ jobs:
         working-directory: ${{env.working-directory}}
 
       - name: Docker Image Build
-        run: docker build -t lkh66913/codementor-apigateway .
+        run: docker build -t lkh66913/codementor-apigateway:${{ steps.timestamp.outputs.timestamp }} .
         working-directory: ${{env.working-directory}}
 
       - name: Docker Hub Login
@@ -41,7 +45,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker Hub Push
-        run: docker push lkh66913/codementor-apigateway
+        run: docker push lkh66913/codementor-apigateway:${{ steps.timestamp.outputs.timestamp }}
 
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
@@ -56,4 +60,4 @@ jobs:
           
       - name: Deploy to GKE
         run: |
-          kubectl set image deployment/codementor-apigateway-deployment codementor-apigateway=lkh66913/codementor-apigateway:latest -n springboot
+          kubectl set image deployment/codementor-apigateway-deployment codementor-apigateway=lkh66913/codementor-apigateway:${{ steps.timestamp.outputs.timestamp }} -n springboot

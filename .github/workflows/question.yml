@@ -20,6 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Get current timestamp
+        id: timestamp
+        run: echo "::set-output name=timestamp::$(date '+%Y%m%d%H%M%S%3N')"
+
       - name: Create default application.yml
         run: |
           mkdir -p ${{env.working-directory}}/src/main/resources
@@ -39,7 +43,7 @@ jobs:
         working-directory: ${{env.working-directory}}
 
       - name: Docker Image Build
-        run: docker build -t lkh66913/codementor-question .
+        run: docker build -t lkh66913/codementor-question:${{ steps.timestamp.outputs.timestamp }} .
         working-directory: ${{env.working-directory}}
 
       - name: Docker Hub Login
@@ -49,7 +53,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker Hub Push
-        run: docker push lkh66913/codementor-question
+        run: docker push lkh66913/codementor-question:${{ steps.timestamp.outputs.timestamp }}
 
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
@@ -64,4 +68,4 @@ jobs:
           
       - name: Deploy to GKE
         run: |
-          kubectl set image deployment/codementor-question-deployment codementor-question=lkh66913/codementor-question:latest -n springboot
+          kubectl set image deployment/codementor-question-deployment codementor-question=lkh66913/codementor-question:${{ steps.timestamp.outputs.timestamp }} -n springboot
