@@ -1,19 +1,18 @@
 package com.codementor.execute.controller;
 
 import com.codementor.execute.dto.ResponseDTO;
-import com.codementor.execute.service.ChatService;
+import com.codementor.evaluate.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
 public class GptController {
 
     private final ChatService chatService;
+
 
     /**
      * GPT-3와의 연동을 확인하는 임시 api
