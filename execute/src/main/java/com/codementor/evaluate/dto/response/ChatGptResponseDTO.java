@@ -1,4 +1,4 @@
-package com.codementor.execute.dto;
+package com.codementor.evaluate.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
