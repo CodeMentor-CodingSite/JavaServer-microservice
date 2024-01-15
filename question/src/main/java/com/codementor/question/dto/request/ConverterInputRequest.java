@@ -1,4 +1,4 @@
-package com.codementor.question.dto;
+package com.codementor.question.dto.request;
 
 import lombok.*;
 
