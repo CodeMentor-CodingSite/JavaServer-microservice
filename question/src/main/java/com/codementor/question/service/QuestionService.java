@@ -1,10 +1,10 @@
 package com.codementor.question.service;
 
 
-import com.codementor.question.dto.ConverterInputRequest;
-import com.codementor.question.dto.QuestionCodeInputRequest;
-import com.codementor.question.dto.QuestionInputRequest;
-import com.codementor.question.dto.TestCaseRequest;
+import com.codementor.question.dto.request.ConverterInputRequest;
+import com.codementor.question.dto.request.QuestionCodeInputRequest;
+import com.codementor.question.dto.request.QuestionInputRequest;
+import com.codementor.question.dto.request.TestCaseRequest;
 import com.codementor.question.entity.*;
 import com.codementor.question.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -104,7 +104,7 @@ public class QuestionService {
         QuestionLanguage questionLanguage = QuestionLanguage.builder()
                 .question(question)
                 .language(language)
-                .initContnet(request.getQuestionInitContent())
+                .initContent(request.getQuestionInitContent())
                 .checkContent(request.getAnswerCheckContent())
                 .build();
 
