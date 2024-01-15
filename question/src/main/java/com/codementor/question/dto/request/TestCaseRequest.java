@@ -1,5 +1,6 @@
-package com.codementor.question.dto;
+package com.codementor.question.dto.request;
 
+import com.codementor.question.dto.TestCaseDetailDTO;
 import lombok.*;
 
 import java.util.ArrayList;
