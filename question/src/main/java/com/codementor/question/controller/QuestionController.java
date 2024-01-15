@@ -1,9 +1,9 @@
 package com.codementor.question.controller;
 
-import com.codementor.question.dto.ConverterInputRequest;
-import com.codementor.question.dto.QuestionCodeInputRequest;
-import com.codementor.question.dto.QuestionInputRequest;
-import com.codementor.question.dto.TestCaseRequest;
+import com.codementor.question.dto.request.ConverterInputRequest;
+import com.codementor.question.dto.request.QuestionCodeInputRequest;
+import com.codementor.question.dto.request.QuestionInputRequest;
+import com.codementor.question.dto.request.TestCaseRequest;
 import com.codementor.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
