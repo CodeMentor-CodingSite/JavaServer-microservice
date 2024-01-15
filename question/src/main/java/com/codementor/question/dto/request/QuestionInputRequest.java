@@ -1,5 +1,6 @@
-package com.codementor.question.dto;
+package com.codementor.question.dto.request;
 
+import com.codementor.question.enums.QuestionDifficulty;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -14,5 +15,6 @@ public class QuestionInputRequest {
     private String questionTitle;
     private String questionContent;
     private String questionCategory;
+    private QuestionDifficulty questionDifficulty;
     private ArrayList<String> questionConstraintContents;
 }
