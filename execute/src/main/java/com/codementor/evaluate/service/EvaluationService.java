@@ -1,5 +1,7 @@
 package com.codementor.evaluate.service;
 
+import com.codementor.evaluate.dto.EvalQuestionTestCaseDetailAndConverterDto;
+import com.codementor.evaluate.dto.EvalQuestionTestCaseDto;
 import com.codementor.evaluate.dto.request.CodeExecutionConverterDto;
 import com.codementor.evaluate.dto.EvaluationDto;
 import com.codementor.evaluate.dto.request.QuestionTestCaseDetailsDto;
@@ -45,43 +47,39 @@ public class EvaluationService {
         // UserCode 관련
         String userCode = evaluationDto.getUserCode();
 
-        // Code Execution Converter 관련
-        CodeExecutionConverterDto codeExecutionConverterDto = evaluationDto.getCodeExecutionConverterDto();
-        String codeExecutionConverterMethodName = codeExecutionConverterDto.getMethodName();
-        String codeExecutionConverterContent = codeExecutionConverterDto.getCodeExecutionConverterContent();
-        String codeExecutionConverterReturnType = codeExecutionConverterDto.getReturnType();
 
         // TestCase 관련
-        List<QuestionTestCaseDto> questionTestCaseDtoList = evaluationDto.getQuestionTestCaseDtoList();
+        List<EvalQuestionTestCaseDto> questionTestCaseDtoList = evaluationDto.getTestCaseDtoList();
 
         // Answer Check 관련
         String answerCheckContent = evaluationDto.getAnswerCheckContent();
 
 
-        for (QuestionTestCaseDto questionTestCaseDto : questionTestCaseDtoList) {
+        for (EvalQuestionTestCaseDto questionTestCaseDto : questionTestCaseDtoList) {
             String pythonScript = "";
-            List<QuestionTestCaseDetailsDto> questionTestCaseDetailsDtoList = questionTestCaseDto.getQuestionTestCaseDetailsDtoList();
+            List<EvalQuestionTestCaseDetailAndConverterDto> questionTestCaseDetailsDtoList = questionTestCaseDto.getEvalQuestionTestCaseDetailAndConverterDtos();
 
             // 유저 코드 입력
             pythonScript += userCode;
 
             pythonScript += "\n\n\n";
 
-            // 코드 실행 컨버터 입력
-            pythonScript += codeExecutionConverterContent;
-
-            pythonScript += "\n\n\n";
-
             // 테스트케이스 입력 및 변환
-            for (QuestionTestCaseDetailsDto questionTestCaseDetailsDto : questionTestCaseDetailsDtoList) {
-                String key = questionTestCaseDetailsDto.getKey();
-                String value = questionTestCaseDetailsDto.getValue();
-                Integer applyConverter = questionTestCaseDetailsDto.getApplyConverter();
+            for (EvalQuestionTestCaseDetailAndConverterDto tcAndcDto : questionTestCaseDetailsDtoList) {
+                String key = tcAndcDto.getTestCaseKey();
+                String value = tcAndcDto.getTestCaseValue();
+                String codeExecConverterContent = tcAndcDto.getCodeExecConverterContent();
+                String returnType = tcAndcDto.getReturnType();
+                String methodName = tcAndcDto.getMethodName();
 
                 pythonScript += key + " = " + value;
 
-                if (applyConverter == 1) {
-                    pythonScript += key + " = " + codeExecutionConverterMethodName + "(" + value + ")";
+                if (codeExecConverterContent != null) {
+                    pythonScript += codeExecConverterContent;
+                    pythonScript += "\n";
+                    pythonScript += key + " = " + methodName + "(" + value + ")";
+                } else {
+                    pythonScript += key + " = " + value;
                 }
 
                 pythonScript += "\n";

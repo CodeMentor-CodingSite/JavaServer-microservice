@@ -17,11 +17,11 @@ import java.util.ArrayList;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ExecuteRequestConsumer {
+public class UserCodeExecuteRequestConsumer {
 
     private final EvaluationService evaluationService;
     private final ChatService chatService;
-    private final ExecuteResponseProducer executeResponseProducer;
+    private final UserCodeExecuteResponseProducer userCodeExecuteResponseProducer;
 
     private static final String TOPIC_NAME = "usercode.request.topic.v1";
 
@@ -50,7 +50,7 @@ public class ExecuteRequestConsumer {
             evaluationDto.setGptEvaluation(evaluationResult);
 
             // Kafka 에 결과값 전송
-            executeResponseProducer.sendToKafka(evaluationDto);
+            userCodeExecuteResponseProducer.sendToKafka(evaluationDto);
 
         } catch (Exception e) {
             log.error("recordListener ERROR message = {}",jsonMessage, e);

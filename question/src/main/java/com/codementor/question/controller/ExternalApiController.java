@@ -6,6 +6,7 @@ import com.codementor.question.service.ExecutionHelperService;
 import com.codementor.question.service.GenericSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,9 +23,8 @@ public class ExternalApiController {
 
 
     @PostMapping("/api/external/execute")
-    public void evalQuestion(EvalRequest evalRequest) {
+    public ResponseEntity<EvaluationDto> evalQuestion(EvalRequest evalRequest) {
         EvaluationDto evaluationDto = executionHelperService.createEvaluationDto(evalRequest.getQuestionId(), evalRequest.getUserLanguage());
-        // Todo: executeUrl 의 controller 주소 작성 필요
-        genericSender.sendData(executeUrl, evaluationDto, EvaluationDto.class);
+        return ResponseEntity.ok(evaluationDto);
     }
 }

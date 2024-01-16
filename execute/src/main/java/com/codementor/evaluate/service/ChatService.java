@@ -1,5 +1,7 @@
 package com.codementor.evaluate.service;
 
+import com.codementor.evaluate.dto.EvalQuestionTestCaseDetailAndConverterDto;
+import com.codementor.evaluate.dto.EvalQuestionTestCaseDto;
 import com.codementor.evaluate.dto.request.ChatGptRequestDTO;
 import com.codementor.evaluate.dto.EvaluationDto;
 import com.codementor.evaluate.dto.request.QuestionTestCaseDetailsDto;
@@ -77,13 +79,13 @@ public class ChatService {
 
         gptPrompt += "'테스트 케이스': \n";
 
-        List<QuestionTestCaseDto> questionTestCaseDtoList = evaluationDto.getQuestionTestCaseDtoList();
+        List<EvalQuestionTestCaseDto> questionTestCaseDtoList = evaluationDto.getTestCaseDtoList();
         for (int i = 0; i < questionTestCaseDtoList.size(); i++) {
             gptPrompt += "테스트 케이스 " + (i + 1) + ": \n";
 
-            List<QuestionTestCaseDetailsDto> questionTestCaseDetailsDtoList = questionTestCaseDtoList.get(i).getQuestionTestCaseDetailsDtoList();
-            for (QuestionTestCaseDetailsDto questionTestCaseDetailsDto : questionTestCaseDetailsDtoList) {
-                gptPrompt += questionTestCaseDetailsDto.getKey() + "=" + questionTestCaseDetailsDto.getValue() + "\n";
+            List<EvalQuestionTestCaseDetailAndConverterDto> tcAndcDtoList = questionTestCaseDtoList.get(i).getEvalQuestionTestCaseDetailAndConverterDtos();
+            for (EvalQuestionTestCaseDetailAndConverterDto tcAndcDto : tcAndcDtoList) {
+                gptPrompt += tcAndcDto.getTestCaseKey() + "=" + tcAndcDto.getTestCaseValue() + "\n";
             }
         }
 
