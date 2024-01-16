@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class GptController {
+public class TestGptController {
 
     private final ChatService chatService;
 
