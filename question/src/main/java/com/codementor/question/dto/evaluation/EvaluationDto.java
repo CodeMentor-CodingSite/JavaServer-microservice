@@ -24,12 +24,12 @@ public class EvaluationDto {
     private String answerCheckContent;
 
 
-//    private Long userId;
-//    private String userLanguage;
-//    private String userCode;
-//
-//
-//    private List<String> testCaseResults;
-//    private String gptEvaluation;
+    private Long userId;
+    private String userLanguage;
+    private String userCode;
+
+
+    private List<String> testCaseResults;
+    private String gptEvaluation;
 
 }
