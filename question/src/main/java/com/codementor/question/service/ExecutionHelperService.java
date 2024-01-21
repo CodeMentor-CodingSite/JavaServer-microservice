@@ -44,7 +44,7 @@ public class ExecutionHelperService {
         for (QuestionConstraint qc : question.getQuestionConstraints()) {
             questionConstraints.add(qc.getContent());
         }
-        List<EvalTestCaseDto> testCaseDtoList = createTestCaseDetailDtoList(question, language);
+        List<EvalTestCaseDto> testCaseDtoList = createTestCaseDtoList(question, language);
         String answerCheckContent = getAnswerCheckContent(question, language);
 
         //builder
@@ -66,7 +66,7 @@ public class ExecutionHelperService {
         return questionLanguage.map(QuestionLanguage::getCheckContent).orElse(null);
     }
 
-    private List<EvalTestCaseDto> createTestCaseDetailDtoList(Question question, Language language) {
+    private List<EvalTestCaseDto> createTestCaseDtoList(Question question, Language language) {
         List<EvalTestCaseDto> testCaseDtoList = new ArrayList<>();
         List<QuestionTestCase> questionTestCaseList = questionTestCaseRepository.findByQuestion(question);
 
@@ -78,6 +78,7 @@ public class ExecutionHelperService {
                     .explanation(testCase.getExplanation())
                     // 각 QuestionTestCase에 연결된 QuestionTestCaseDetail들을 순회하며 해당 Language에 해당하는 Converter를 찾아 TestCaseDetailAndConverterDto를 생성
                     .evalTestCaseDetailAndConverterDtos(createTestCaseDetailAndConverterDtoList(testCase, language))
+                    .testCaseResult("processing")
                     .build();
             testCaseDtoList.add(testCaseDto);
         }
