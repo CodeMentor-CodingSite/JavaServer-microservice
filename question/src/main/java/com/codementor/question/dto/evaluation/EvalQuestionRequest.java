@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class EvalRequest {
+public class EvalQuestionRequest {
     private Long questionId;
     private String userLanguage;
 }
