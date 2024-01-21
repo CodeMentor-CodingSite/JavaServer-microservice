@@ -9,10 +9,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EvalQuestionTestCaseDto {
+public class EvalTestCaseDto {
 
     private Long testCaseId;
     private Boolean isExample;
     private String explanation;
-    private List<EvalQuestionTestCaseDetailAndConverterDto> evalQuestionTestCaseDetailAndConverterDtos;
+    private List<EvalTestCaseDetailAndConverterDto> evalTestCaseDetailAndConverterDtos;
+    private String testCaseResult;
 }
