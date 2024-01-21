@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class EvalQuestionTestCaseDetailAndConverterDto {
+public class EvalTestCaseDetailAndConverterDto {
     // CodeExecConverter 필드
     private String codeExecConverterContent;
     private String returnType;
