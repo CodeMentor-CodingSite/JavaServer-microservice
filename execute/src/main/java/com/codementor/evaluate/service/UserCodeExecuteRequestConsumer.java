@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,20 +41,43 @@ public class UserCodeExecuteRequestConsumer {
             EvaluationDto evaluationDto = objectMapper.readValue(jsonMessage, EvaluationDto.class);
             log.info("recordListener message = {}",jsonMessage);
 
-            // 코드 실행에 대한 결과 값들이 담긴 배열
-            ArrayList<String> executionResults = evaluationService.processExecutionResults(evaluationDto);
-            // Gpt 서버의 평가 결과를 받아옴
-            String evaluationResult = chatService.gptUserCodeEvaluation(evaluationDto);
+            // 비동기통신으로 코드 실행 결과값들을 Kafka 에 전송
+            sendToKafkaWithExecutionResults(evaluationDto);
 
-            // 결과값들을 기존 EvaluationDto에 담음
-            evaluationDto.setTestCaseResults(executionResults);
-            evaluationDto.setGptEvaluation(evaluationResult);
-
-            // Kafka 에 결과값 전송
-            userCodeExecuteResponseProducer.sendToKafka(evaluationDto);
+            // 비동기통신으로 Gpt 서버의 평가 결과를 Kafka 에 전송
+            sendToKafkaWithGptEvaluation(evaluationDto);
 
         } catch (Exception e) {
             log.error("recordListener ERROR message = {}",jsonMessage, e);
         }
+    }
+
+    /**
+     * 비동기통신으로 코드 실행 결과값들을 Kafka 에 전송
+     * @param evaluationDto Kafka 에서 받은 EvaluationDto 객체
+     */
+    @Async
+    protected void sendToKafkaWithExecutionResults(EvaluationDto evaluationDto){
+        // 코드 실행에 대한 결과 값들이 담긴 배열
+        ArrayList<String> executionResults = evaluationService.processExecutionResults(evaluationDto);
+        // 코드 실행에 대한 결과 값들을 기존 EvaluationDto에 담음
+        evaluationDto.setTestCaseResults(executionResults);
+        // Kafka 에 결과값 전송
+        userCodeExecuteResponseProducer.sendToKafka(evaluationDto);
+    }
+
+    /**
+     * 비동기통신으로 Gpt 서버의 평가 결과를 Kafka 에 전송
+     * @param evaluationDto Kafka 에서 받은 EvaluationDto 객체
+     * @throws Exception Gpt 서버와 통신 중 에러 발생
+     */
+    @Async
+    protected void sendToKafkaWithGptEvaluation(EvaluationDto evaluationDto) throws Exception {
+        // Gpt 서버의 평가 결과
+        String evaluationResult = chatService.gptUserCodeEvaluation(evaluationDto);
+        // Gpt 서버의 평가 결과를 기존 EvaluationDto에 담음
+        evaluationDto.setGptEvaluation(evaluationResult);
+        // Kafka 에 결과값 전송
+        userCodeExecuteResponseProducer.sendToKafka(evaluationDto);
     }
 }
