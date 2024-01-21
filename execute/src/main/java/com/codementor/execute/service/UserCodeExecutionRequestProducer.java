@@ -3,6 +3,8 @@ package com.codementor.execute.service;
 import com.codementor.execute.dto.evaluation.EvalQuestionRequest;
 import com.codementor.execute.dto.evaluation.EvaluationDto;
 import com.codementor.execute.dto.request.UserCodeExecutionRequest;
+import com.codementor.execute.entity.ExecuteUsercode;
+import com.codementor.execute.repository.ExecuteUsercodeRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -22,6 +25,7 @@ public class UserCodeExecutionRequestProducer {
 
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ExecuteUsercodeRepository executeUsercodeRepository;
     private RestTemplate restTemplate;
 
     private static final String TOPIC_NAME = "usercode.request.topic.v1";
@@ -46,6 +50,8 @@ public class UserCodeExecutionRequestProducer {
 
         EvaluationDto evaluationDto = getQuestionDataFromQuestionServer(questionUrl, questionRequest);
         evaluationDto.updateWith(userCodeExecutionRequest);
+        Integer executeUserCodeId = saveEvaluationDtoBeforeEvaluation(evaluationDto);
+        evaluationDto.setExecuteUserCodeId(executeUserCodeId.longValue());
         return evaluationDto;
     }
 
@@ -67,6 +73,23 @@ public class UserCodeExecutionRequestProducer {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Saves executeUsercode before evaluation
+     * @param evaluationDto evaluationDto without evaluation
+     * @return id of saved executeUsercode
+     */
+    @Transactional
+    public Integer saveEvaluationDtoBeforeEvaluation(EvaluationDto evaluationDto) {
+        ExecuteUsercode executeUsercode = ExecuteUsercode.builder()
+                .questionId(evaluationDto.getQuestionId())
+                .userLanguage(evaluationDto.getUserLanguage())
+                .userCode(evaluationDto.getUserCode())
+                .build();
+
+        ExecuteUsercode response = executeUsercodeRepository.save(executeUsercode);
+        return response.getId().intValue();
     }
 
 }
