@@ -3,6 +3,7 @@ package com.codementor.user.service;
 import com.codementor.user.config.JwtProvider;
 import com.codementor.user.dto.TokenDTO;
 import com.codementor.user.dto.UserDTO;
+import com.codementor.user.dto.UserProfileDTO;
 import com.codementor.user.entity.User;
 import com.codementor.user.exception.UserErrorEnum;
 import com.codementor.user.exception.UserException;
@@ -40,6 +41,16 @@ public class UserService {
         }
 
         return createAllToken(responseUser);
+    }
+
+    @Transactional
+    public UserProfileDTO getUser(Long userId) {
+        User foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+
+        return UserProfileDTO.builder()
+                .nickname(foundUser.getNickname())
+                .build();
     }
 
     private void checkExistedUser(UserDTO userDTO) {
