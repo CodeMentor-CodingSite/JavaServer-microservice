@@ -1,4 +1,4 @@
-package com.codementor.question.dto.evaluation;
+package com.codementor.question.dto.external;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
