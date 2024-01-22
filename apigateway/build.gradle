@@ -20,11 +20,20 @@ ext {
 }
 
 dependencies {
-	compileOnly 'org.projectlombok:lombok'
+	// lombok
+	implementation 'org.projectlombok:lombok'
+	implementation 'org.jetbrains:annotations:20.1.0'
 	annotationProcessor 'org.projectlombok:lombok'
-	
+
+	// spring-cloud api gateway
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 
+	// jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+
+	// default & test
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
