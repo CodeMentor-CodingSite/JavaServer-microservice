@@ -21,15 +21,16 @@ public class EvaluationDto {
     private List<String> questionConstraints;
 
 
-    private List<EvalQuestionTestCaseDto> testCaseDtoList;
+    private List<EvalTestCaseDto> testCaseDtoList;
     private String answerCheckContent;
 
 
     private Long userId;
     private String userLanguage;
     private String userCode;
+    private Long executeUserCodeId;
 
-
+    private Long executeTime;
     private List<String> testCaseResults;
     private String gptEvaluation;
 

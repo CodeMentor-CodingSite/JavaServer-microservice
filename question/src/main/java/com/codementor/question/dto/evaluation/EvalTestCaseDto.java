@@ -15,4 +15,5 @@ public class EvalTestCaseDto {
     private Boolean isExample;
     private String explanation;
     private List<EvalTestCaseDetailAndConverterDto> evalTestCaseDetailAndConverterDtos;
+    private String testCaseResult;
 }

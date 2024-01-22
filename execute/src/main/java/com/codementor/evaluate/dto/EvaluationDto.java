@@ -41,15 +41,19 @@ public class EvaluationDto {
      * userId: 유저 아이디
      * userLanguage: 유저가 선택한 언어
      * userCode: 유저가 작성한 코드
+     * executeUserCodeId: 유저 코드 실행 엔터티 아이디
      */
     private Long userId;
     private String userLanguage;
     private String userCode;
+    private Long executeUserCodeId;
 
     /**
+     * executeTime: 유저 코드 실행 시간
      * testCaseResults: 테스트 케이스 결과
      * gptEvaluation: gpt 평가 결과
      */
+    private Long executeTime;
     private List<String> testCaseResults;
     private String gptEvaluation;
 }

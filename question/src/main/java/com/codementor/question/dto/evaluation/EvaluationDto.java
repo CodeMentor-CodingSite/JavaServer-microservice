@@ -27,8 +27,9 @@ public class EvaluationDto {
     private Long userId;
     private String userLanguage;
     private String userCode;
+    private Long executeUserCodeId;
 
-
+    private Long executeTime;
     private List<String> testCaseResults;
     private String gptEvaluation;
 
