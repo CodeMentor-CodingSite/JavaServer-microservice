@@ -48,7 +48,7 @@ public class UserCodeExecutionRequestProducer {
                 .userLanguage(userCodeExecutionRequest.getUserLanguage())
                 .build();
 
-        EvaluationDto evaluationDto = getQuestionDataFromQuestionServer(questionUrl, questionRequest);
+        EvaluationDto evaluationDto = getQuestionDataFromQuestionServer(questionUrl+ "/api/external/execute", questionRequest);
         evaluationDto.updateWith(userCodeExecutionRequest);
         Integer executeUserCodeId = saveEvaluationDtoBeforeEvaluation(evaluationDto);
         evaluationDto.setExecuteUserCodeId(executeUserCodeId.longValue());
