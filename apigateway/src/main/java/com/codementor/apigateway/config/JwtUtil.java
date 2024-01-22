@@ -8,10 +8,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.server.NotAcceptableStatusException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Key;
 
@@ -36,7 +33,7 @@ public class JwtUtil {
     public Claims parseTokenToClaims(String token, String role) {
         token = token.substring("Bearer ".length());
 
-        Claims claims =  Jwts.parserBuilder()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key).build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -17,7 +17,7 @@ public class AuthorizationUserFilter extends AbstractGatewayFilterFactory<Object
     public GatewayFilter apply(Object config) {
         return (exchange, chain) -> {
             String accessToken = jwtUtil.getToken(exchange.getRequest(), "access");
-            String refreshToken = jwtUtil.getToken(exchange.getRequest(), "refresh");;
+            String refreshToken = jwtUtil.getToken(exchange.getRequest(), "refresh");
 
             if (accessToken != null) {
                 Claims claims = jwtUtil.parseTokenToClaims(accessToken, "user");
