@@ -17,7 +17,7 @@ public enum UserErrorEnum {
     private final int code;
     private final String message;
 
-    public ErrorDTO getErrorDTO(){
+    public ErrorDTO getErrorDTO() {
         return ErrorDTO.builder()
                 .errorCode(code)
                 .errorMessage(message)

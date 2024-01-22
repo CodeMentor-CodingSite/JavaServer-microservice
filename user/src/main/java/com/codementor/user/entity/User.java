@@ -1,6 +1,5 @@
 package com.codementor.user.entity;
 
-import com.codementor.user.config.JwtProvider;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -33,12 +32,12 @@ public class User {
     @Column(name = "user_lastname", columnDefinition = "VARCHAR(50)")
     private String lastname;
 
-    @Column( name = "user_role", columnDefinition = "VARCHAR(10)")
+    @Column(name = "user_role", columnDefinition = "VARCHAR(10)")
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @Builder.Default
-    @Column( name = "user_status", columnDefinition = "VARCHAR(50) DEFAULT 'OPEN'")
+    @Column(name = "user_status", columnDefinition = "VARCHAR(50) DEFAULT 'OPEN'")
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.OPEN;
 
