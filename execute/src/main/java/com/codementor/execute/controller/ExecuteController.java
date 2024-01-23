@@ -1,41 +1,26 @@
 package com.codementor.execute.controller;
 
-import com.codementor.execute.dto.request.UserCodeExecutionRequest;
-import com.codementor.execute.service.SseConnectionService;
-import com.codementor.execute.service.UserCodeExecutionRequestProducer;
+import com.codementor.execute.dto.UserSolvedRatioSubmitDto;
+import com.codementor.execute.dto.UserSolvedRatioTotalDto;
+import com.codementor.execute.service.ExecuteService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
 public class ExecuteController {
 
-    private final UserCodeExecutionRequestProducer userCodeExecutionRequestProducer;
-    private final SseConnectionService sseConnectionService;
+    private final ExecuteService executeService;
 
-
-    /**
-     * 유저와 SseEmitter를 연결한다.
-     * @param userId 유저 아이디
-     * @return SseEmitter
-     */
-    @PostMapping("/api/openSseConnection")
-    public SseEmitter subscribe(String userId){
-        return sseConnectionService.createEmitterForUsers(userId);
+    @GetMapping("/api/execute/problem/solved/ratio/submit")
+    public UserSolvedRatioSubmitDto getUserProblemSolvedSubmitRatio(Long userId){
+        return executeService.getUserSolvedRatioSubmit(userId);
     }
 
-    /**
-     * subscribe를 통해 SseConnection을 먼저 만들어 놓는다.
-     * 유저에게 SseEmitter를 통해 gpt평가 결과를 전송한다.
-     * @param userCodeExecutionRequest 유저의 코드 및 관련 데이터
-     * @return 성공 메시지
-     */
-    @PostMapping("/api/execute/userCode")
-    public String evaluateUserCode(@RequestBody UserCodeExecutionRequest userCodeExecutionRequest) {
-        userCodeExecutionRequestProducer.sendUserCodeExecutionRequestToKafka(userCodeExecutionRequest);
-        return "user code sent to execution kafka topic";
+    @GetMapping("/api/execute/problem/solved/ratio/total")
+    public UserSolvedRatioTotalDto getUserProblemSolvedTotalRatio(Long userId){
+        return executeService.getUserSolvedRatioTotal(userId);
     }
 }

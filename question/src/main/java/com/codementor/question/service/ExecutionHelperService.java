@@ -1,15 +1,15 @@
 package com.codementor.question.service;
 
-import com.codementor.question.dto.evaluation.EvaluationDto;
-import com.codementor.question.dto.evaluation.EvalTestCaseDetailAndConverterDto;
-import com.codementor.question.dto.evaluation.EvalTestCaseDto;
+import com.codementor.question.dto.external.*;
 import com.codementor.question.entity.*;
+import com.codementor.question.enums.QuestionDifficulty;
 import com.codementor.question.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +85,6 @@ public class ExecutionHelperService {
         return testCaseDtoList;
     }
 
-
     private List<EvalTestCaseDetailAndConverterDto> createTestCaseDetailAndConverterDtoList(QuestionTestCase questionTestCase, Language language){
         List<EvalTestCaseDetailAndConverterDto> resultList = new ArrayList<>();
 
@@ -110,5 +109,56 @@ public class ExecutionHelperService {
             }
         }
         return resultList;
+    }
+
+    public QuestionDifficultyCounts getQuestionsDifficultyCounts(){
+        List<Question> questionsList = questionRepository.findAll();
+        Long easy = 0L;
+        Long medium = 0L;
+        Long hard = 0L;
+
+        for (Question question : questionsList) {
+            switch (question.getDifficulty()) {
+                case EASY:
+                    easy++;
+                case MEDIUM:
+                    medium++;
+                case HARD:
+                    hard++;
+            }
+        }
+        return QuestionDifficultyCounts.builder()
+                .easyProblemsCount(easy)
+                .mediumProblemsCount(medium)
+                .hardProblemsCount(hard)
+                .build();
+    }
+
+    public UserSolvedRatioTotalDto getUserSolvedRatioSubmitDto(UserSolvedRatioTotalDto req){
+        // make a hashset for unique user problem list
+        HashSet<Long> questionSolvedList = new HashSet<>();
+        for (Long questionId : req.getQuestionIdList()) {
+            questionSolvedList.add(questionId);
+        }
+        Long easyProblemSolvedCount = 0L;
+        Long mediumProblemSolvedCount = 0L;
+        Long hardProblemSolvedCount = 0L;
+        List<Question> questionsList = questionRepository.findAll();
+        for (Question question : questionsList) {
+            if (questionSolvedList.contains(question.getId())) {
+                switch (question.getDifficulty()) {
+                    case EASY:
+                        easyProblemSolvedCount++;
+                    case MEDIUM:
+                        mediumProblemSolvedCount++;
+                    case HARD:
+                        hardProblemSolvedCount++;
+                }
+            }
+        }
+        req.setEasyProblemSolvedCount(easyProblemSolvedCount);
+        req.setMediumProblemSolvedCount(mediumProblemSolvedCount);
+        req.setHardProblemSolvedCount(hardProblemSolvedCount);
+        return req;
     }
 }
