@@ -1,9 +1,6 @@
 package com.codementor.question.controller;
 
-import com.codementor.question.dto.external.EvalQuestionRequest;
-import com.codementor.question.dto.external.EvaluationDto;
-import com.codementor.question.dto.external.QuestionDifficultyCounts;
-import com.codementor.question.dto.external.UserSolvedRatioTotalDto;
+import com.codementor.question.dto.external.*;
 import com.codementor.question.service.ExecutionHelperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +31,10 @@ public class ExternalApiController {
     @PostMapping("/api/external/getUserSolvedCounts")
     public UserSolvedRatioTotalDto getUserSolvedCounts(UserSolvedRatioTotalDto req){
         return executionHelperService.getUserSolvedRatioSubmitDto(req);
+    }
+
+    @PostMapping("/api/external/getUserSolvedCategory")
+    public UserSolvedCategoryDtoList getUserSolvedCategory(UserSolvedQuestionIdList req){
+        return executionHelperService.getUserSolvedCategoryQuestionList(req);
     }
 }
