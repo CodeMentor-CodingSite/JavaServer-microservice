@@ -7,14 +7,16 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum TokenErrorEnum {
-    NOT_ADMIN_TOKEN(HttpStatus.BAD_REQUEST, 5001, "접근할 수 없습니다.\nAdmin 사용자가 아닙니다"),
-    NOT_USER_TOKEN(HttpStatus.BAD_REQUEST, 5002, "접근할 수 없습니다.\nUser 사용자가 아닙니다");
+    NOT_ADMIN_TOKEN(HttpStatus.FORBIDDEN, HttpStatus.FORBIDDEN.value(), "접근할 수 없습니다. Admin 사용자가 아닙니다"),
+    NOT_USER_TOKEN(HttpStatus.FORBIDDEN, HttpStatus.FORBIDDEN.value(), "접근할 수 없습니다. User 사용자가 아닙니다"),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, HttpStatus.UNAUTHORIZED.value(), "토큰이 필요합니다"),
+    EXPIRED_JWT(HttpStatus.UNAUTHORIZED, HttpStatus.UNAUTHORIZED.value(), "리프레쉬 토큰이 만료되었습니다.");
 
     private final HttpStatus status;
     private final int code;
     private final String message;
 
-    public ErrorDTO getErrorDTO(){
+    public ErrorDTO getErrorDTO() {
         return ErrorDTO.builder()
                 .errorCode(code)
                 .errorMessage(message)
