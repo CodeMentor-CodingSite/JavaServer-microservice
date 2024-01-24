@@ -31,7 +31,7 @@ public class JwtUtil {
     }
 
     public Claims parseTokenToClaims(String token, String role) {
-        token = token.substring("Bearer ".length());
+        token = token.replace("Bearer", "");
 
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key).build()

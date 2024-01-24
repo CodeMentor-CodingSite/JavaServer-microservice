@@ -8,6 +8,7 @@ import com.codementor.user.entity.User;
 import com.codementor.user.exception.UserErrorEnum;
 import com.codementor.user.exception.UserException;
 import com.codementor.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,21 @@ public class UserService {
         return UserProfileDTO.builder()
                 .nickname(foundUser.getNickname())
                 .build();
+    }
+
+    @Transactional
+    public TokenDTO reissueToken(String token) {
+        User foundUser = userRepository.findById(getUserIdInToken(token))
+                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+
+        return TokenDTO.builder()
+                .accessToken(createAccessToken(foundUser))
+                .build();
+    }
+
+    private Long getUserIdInToken(String token) {
+        Claims claims = jwtProvider.parseTokenToClaims(token);
+        return Long.valueOf(claims.get("id").toString());
     }
 
     private void checkExistedUser(UserDTO userDTO) {
