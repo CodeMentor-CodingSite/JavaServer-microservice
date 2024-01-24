@@ -8,10 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 해당 클래스는 execution 서버가 kafka에 EvaluationDto를 전송해야할때 필요한 Question 데이터 일부를 가공하는 클래스.
@@ -160,5 +158,14 @@ public class ExecutionHelperService {
         req.setMediumProblemSolvedCount(mediumProblemSolvedCount);
         req.setHardProblemSolvedCount(hardProblemSolvedCount);
         return req;
+    }
+
+    public UserSolvedCategoryDtoList getUserSolvedCategoryQuestionList(UserSolvedQuestionIdList req){
+        Set<Long> problemIdSet = new HashSet<>(req.getProblemIdList());
+        List<Question> questionsList = questionRepository.findAllById(problemIdSet);
+        List<UserSolvedCategoryDto> result = questionsList.stream()
+                .map(question -> new UserSolvedCategoryDto().from(question))
+                .collect(Collectors.toList());
+        return new UserSolvedCategoryDtoList(result);
     }
 }

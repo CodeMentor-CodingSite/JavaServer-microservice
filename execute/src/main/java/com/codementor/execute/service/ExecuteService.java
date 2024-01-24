@@ -1,10 +1,13 @@
 package com.codementor.execute.service;
 
+import com.codementor.execute.dto.UserSolvedCategoryDto;
+import com.codementor.execute.dto.UserSolvedCategoryDtoList;
 import com.codementor.execute.dto.evaluation.EvalQuestionRequest;
 import com.codementor.execute.dto.evaluation.EvaluationDto;
 import com.codementor.execute.dto.UserSolvedRatioSubmitDto;
 import com.codementor.execute.dto.UserSolvedRatioTotalDto;
 import com.codementor.execute.dto.external.QuestionDifficultyCounts;
+import com.codementor.execute.dto.external.UserSolvedQuestionIdList;
 import com.codementor.execute.entity.ExecuteUsercode;
 import com.codementor.execute.repository.ExecuteUsercodeRepository;
 import com.mysql.cj.x.protobuf.MysqlxPrepare;
@@ -40,7 +43,13 @@ public class ExecuteService {
         return new UserSolvedRatioSubmitDto(userSolved, userSubmitted);
     }
 
+    /**
+     * 유저가 푼 문제 수와 전체 문제 수를 가져온다.
+     * @param userId 유저 아이디
+     * @return 유저가 푼 문제 수와 전체 문제 수
+     */
     public UserSolvedRatioTotalDto getUserSolvedRatioTotal(Long userId){
+        // 풀었던 문제 아이디를 가져온다.
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
         List<Long> correctQuestionIdList = executeUsercodeList.stream()
                 .filter(ExecuteUsercode::getIsCorrect)
@@ -59,6 +68,33 @@ public class ExecuteService {
         userSolvedRatioTotalDto.setHardProblemSolvedCount(questionDifficultyCounts.getHardProblemsCount());
 
         return userSolvedRatioTotalDto;
+    }
+
+    /**
+     * 유저가 푼 문제에 대한 카테고리와 난이도가 포함된 정보를 가져온다.
+     * @param userId 유저 아이디
+     * @return 유저가 푼 문제에 대한 카테고리와 난이도가 포함된 정보
+     */
+    public UserSolvedCategoryDtoList getUserSolvedQuestion(Long userId){
+        // 풀었던 문제 아이디를 가져온다.
+        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
+        List<Long> correctQuestionIdList = executeUsercodeList.stream()
+                .filter(ExecuteUsercode::getIsCorrect)
+                .map(ExecuteUsercode::getQuestionId)
+                .collect(Collectors.toList());
+
+        UserSolvedQuestionIdList sendDto = new UserSolvedQuestionIdList(userId, correctQuestionIdList);
+        UserSolvedCategoryDtoList userSolvedCategoryDtoList = getSolvedQuestionDataFromQuestionServer(questionUrl+"/api/external/getUserSolvedCategory", sendDto);
+        return userSolvedCategoryDtoList;
+    }
+
+    private UserSolvedCategoryDtoList getSolvedQuestionDataFromQuestionServer(String url, UserSolvedQuestionIdList userSolvedQuestionIdList) {
+        ResponseEntity<UserSolvedCategoryDtoList> response = restTemplate.postForEntity(url, userSolvedQuestionIdList, UserSolvedCategoryDtoList.class);
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            return response.getBody();
+        } else {
+            throw new RuntimeException("Failed to get valid response from " + url);
+        }
     }
 
     private QuestionDifficultyCounts getQuestionDifficultyCounts(String url) {
