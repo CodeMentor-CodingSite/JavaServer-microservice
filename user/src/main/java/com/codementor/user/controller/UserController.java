@@ -38,4 +38,12 @@ public class UserController {
 
         return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
     }
+
+    @GetMapping("/reissue")
+    public ResponseEntity<TokenDTO> reissueToken(@RequestHeader("refresh_token") String token) {
+        TokenDTO tokenDTO = userService.reissueToken(token);
+
+        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+
+    }
 }

@@ -56,17 +56,12 @@ public class JwtProvider {
                 .compact();
     }
 
-    public Claims tokenToClaim(String token) {
-        if (token != null) {
-            token = token.substring("Bearer".length());
+    public Claims parseTokenToClaims(String token) {
+        token = token.replace("Bearer", "");
 
-            return Jwts.parser()
-                    .setSigningKey(key)
-                    .parseClaimsJws(token)
-                    .getBody();
-
-        } else {
-            return null;
-        }
+        return Jwts.parserBuilder()
+                .setSigningKey(key).build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
