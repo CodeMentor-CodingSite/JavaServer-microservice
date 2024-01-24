@@ -52,7 +52,7 @@ public class AuthorizationUserFilter extends AbstractGatewayFilterFactory<Object
 
     private Mono<Void> redirectReissue(ServerWebExchange exchange) {
         ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.PERMANENT_REDIRECT);
+        response.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
         response.getHeaders().setLocation(URI.create("/api/user/reissue"));
         return response.setComplete();
     }
