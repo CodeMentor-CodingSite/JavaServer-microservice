@@ -1,10 +1,10 @@
-name: user
+name: execute
 on:
   push:
-    branches: 
+    branches:
       - main
     paths:
-      - 'user/**'
+      - 'evaluation/**'
 
 permissions:
   contents: read
@@ -13,7 +13,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      working-directory: ./user
+      working-directory: ./evaluation
 
     steps:
       # checkout 설명 https://www.daleseo.com/github-actions-checkout/
@@ -29,7 +29,7 @@ jobs:
           mkdir -p ${{env.working-directory}}/src/main/resources
           touch ${{env.working-directory}}/src/main/resources/application.yml
           
-          echo "${{ vars.USER_APPLICATION_YML }}" >> ${{env.working-directory}}/src/main/resources/application.yml
+          echo "${{ vars.EVALUATION_APPLICATION_YML }}" >> ${{env.working-directory}}/src/main/resources/application.yml
         shell: bash
 
       - name: Grant execute permission for gradlew
@@ -43,7 +43,7 @@ jobs:
         working-directory: ${{env.working-directory}}
 
       - name: Docker Image Build
-        run: docker build -t lkh66913/codementor-user:${{ steps.timestamp.outputs.timestamp }} .
+        run: docker build -t lkh66913/codementor-evaluation:${{ steps.timestamp.outputs.timestamp }} .
         working-directory: ${{env.working-directory}}
 
       - name: Docker Hub Login
@@ -53,7 +53,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker Hub Push
-        run: docker push lkh66913/codementor-user:${{ steps.timestamp.outputs.timestamp }}
+        run: docker push lkh66913/codementor-evaluation:${{ steps.timestamp.outputs.timestamp }}
 
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
@@ -68,4 +68,4 @@ jobs:
           
       - name: Deploy to GKE
         run: |
-          kubectl set image deployment/codementor-user-deployment codementor-user=lkh66913/codementor-user:${{ steps.timestamp.outputs.timestamp }} -n springboot
+          kubectl set image deployment/codementor-evaluation-deployment codementor-evaluation=lkh66913/codementor-evaluation:${{ steps.timestamp.outputs.timestamp }} -n springboot
