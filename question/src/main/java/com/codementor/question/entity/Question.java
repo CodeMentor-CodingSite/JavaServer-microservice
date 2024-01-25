@@ -51,4 +51,7 @@ public class Question {
 
     @OneToMany(mappedBy = "question")
     private List<QuestionLanguage> questionLanguages;
+
+    @OneToMany(mappedBy = "question")
+    private List<PlanMap> planMaps;
 }

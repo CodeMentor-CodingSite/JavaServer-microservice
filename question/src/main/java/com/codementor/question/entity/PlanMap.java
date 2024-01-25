@@ -3,6 +3,9 @@ package com.codementor.question.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter

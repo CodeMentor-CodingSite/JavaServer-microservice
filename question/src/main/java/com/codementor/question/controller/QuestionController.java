@@ -1,46 +1,42 @@
 package com.codementor.question.controller;
 
-import com.codementor.question.dto.request.ConverterInputRequest;
-import com.codementor.question.dto.request.QuestionCodeInputRequest;
-import com.codementor.question.dto.request.QuestionInputRequest;
-import com.codementor.question.dto.request.TestCaseRequest;
+import com.codementor.question.dto.response.PlanResponse;
+import com.codementor.question.dto.response.QuestionDetailDtoResponse;
+import com.codementor.question.dto.QuestionDto;
+import com.codementor.question.dto.response.QuestionInitCodeResponse;
 import com.codementor.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/question/input/")
+@RequestMapping("/api/question")
 public class QuestionController {
 
     private final QuestionService questionService;
 
-    @PostMapping("/question")
-    public ResponseEntity<String> questionInput(@RequestBody QuestionInputRequest request) {
-        Integer questionId = questionService.questionInput(request);
-        return ResponseEntity.ok(questionId.toString());
+    @GetMapping("/question")
+    public Page<QuestionDto> getQuestionList(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size,
+            Long userId) {
+        return questionService.getPaginatedQuestionDtos(userId, PageRequest.of(page, size));
     }
 
-    @PostMapping("/testcase")
-    public ResponseEntity<String> testCaseInput(@RequestBody TestCaseRequest request) {
-        Integer testCaseId = questionService.testCaseInput(request);
-        return ResponseEntity.ok(testCaseId.toString());
+    @GetMapping("/question/{questionId}")
+    public QuestionDetailDtoResponse getQuestionDetail(@PathVariable Long questionId) {
+        return questionService.getQuestionById(questionId);
     }
 
-    @PostMapping("/converter")
-    public ResponseEntity<String> converterInput(@RequestBody ConverterInputRequest request) {
-        Integer converterId = questionService.converterInput(request);
-        return ResponseEntity.ok(converterId.toString());
+    @GetMapping("question/{questionId}/initial-code/{langauage}")
+    public QuestionInitCodeResponse getQuestionInitialCode(@PathVariable Long questionId, @PathVariable String language) {
+        return questionService.getQuestionInitialCode(questionId, language);
     }
 
-    @PostMapping("/question-code")
-    public ResponseEntity<String> questionCodeInput(@RequestBody QuestionCodeInputRequest request) {
-        Integer questionCodeId = questionService.questionCodeInput(request);
-        return ResponseEntity.ok(questionCodeId.toString());
+    @GetMapping("/plan")
+    public PlanResponse getPlanList() {
+        return questionService.getAllPlans();
     }
 }

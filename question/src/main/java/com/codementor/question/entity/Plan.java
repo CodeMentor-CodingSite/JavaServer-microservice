@@ -3,23 +3,27 @@ package com.codementor.question.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "package")
+@Table(name = "plan")
 public class Plan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "package_id")
+    @Column(name = "plan_id")
     private Long id;
 
-    @Column(name = "package_name", columnDefinition = "VARCHAR(50)")
+    @Column(name = "plan_name", columnDefinition = "VARCHAR(50)")
     private String planName;
 
-    @Column(name = "package_explanation", columnDefinition = "TEXT")
+    @Column(name = "plan_explanation", columnDefinition = "TEXT")
     private String planExplanation;
+
+    @OneToMany(mappedBy = "plan")
+    private List<PlanMap> planMaps;
 }
