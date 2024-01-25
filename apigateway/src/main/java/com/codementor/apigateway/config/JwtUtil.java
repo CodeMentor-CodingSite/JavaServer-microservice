@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.security.Key;
 
@@ -20,29 +21,28 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(tokenSecret));
     }
 
-    public void addAuthorizationHeaders(ServerHttpRequest request, Claims claims) {
-        System.out.println(claims.toString());
-        System.out.println(claims.get("id").toString());
+    public void validateToken(String token, ServerWebExchange exchange, String role) {
+        Claims claims = parseTokenToClaims(token);
 
+        if (role.equals("admin")) checkAdminRole(claims);
+
+        addAuthorizationHeaders(exchange.getRequest(), claims);
+    }
+
+    private void addAuthorizationHeaders(ServerHttpRequest request, Claims claims) {
         request.mutate()
                 .header("id", claims.get("id").toString())
                 .header("email", claims.get("email").toString())
                 .build();
     }
 
-    public Claims parseTokenToClaims(String token, String role) {
+    private Claims parseTokenToClaims(String token) {
         token = token.replace("Bearer", "");
 
-        Claims claims = Jwts.parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(key).build()
                 .parseClaimsJws(token)
                 .getBody();
-
-        if (role.equals("admin") && !checkAdminRole(claims)) {
-            throw new TokenException(TokenErrorEnum.NOT_ADMIN_TOKEN);
-        }
-
-        return claims;
     }
 
     public String getToken(ServerHttpRequest request, String type) {
@@ -57,7 +57,7 @@ public class JwtUtil {
         return token;
     }
 
-    public boolean checkAdminRole(Claims claims) {
-        return claims.get("role").toString().equals("ADMIN");
+    private void checkAdminRole(Claims claims) {
+        if (!claims.get("role").toString().equals("ADMIN")) throw new TokenException(TokenErrorEnum.NOT_ADMIN_TOKEN);
     }
 }
