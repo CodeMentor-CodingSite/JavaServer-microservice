@@ -39,6 +39,7 @@ public class ExecuteService {
         return new UserSolvedRatioSubmitDto(userSolved, userSubmitted);
     }
 
+
     /**
      * 유저가 푼 문제 수와 전체 문제 수를 가져온다.
      * @param userId 유저 아이디
