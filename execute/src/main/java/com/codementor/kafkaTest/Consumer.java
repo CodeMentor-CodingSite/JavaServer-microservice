@@ -15,9 +15,9 @@ public class Consumer {
     private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = TOPIC_NAME, groupId = GROUP_ID)
-    public void kafkaListener(String jsonMNessage) {
+    public void kafkaListener(String jsonMessage) {
         try {
-            MessageDTO messageDTO = objectMapper.readValue(jsonMNessage, MessageDTO.class);
+            MessageDTO messageDTO = objectMapper.readValue(jsonMessage, MessageDTO.class);
             System.out.println("Consumer: " + messageDTO);
         } catch (Exception e) {
             throw new RuntimeException(e);

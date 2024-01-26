@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ExecuteUsercodeRepository extends JpaRepository<ExecuteUsercode, Long> {
 
-    List<Long> findAllByUserIdAAndIsCorrect(Long userId, Boolean isCorrect);
+    List<Long> findAllByUserIdAndIsCorrect(Long userId, Boolean isCorrect);
 
     List<ExecuteUsercode> findAllByUserId(Long userId);
 }
