@@ -1,10 +1,10 @@
-name: execute
+name: evaluate
 on:
   push:
     branches:
       - main
     paths:
-      - 'evaluation/**'
+      - 'evaluate/**'
 
 permissions:
   contents: read
@@ -13,7 +13,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      working-directory: ./evaluation
+      working-directory: ./evaluate
 
     steps:
       # checkout 설명 https://www.daleseo.com/github-actions-checkout/
