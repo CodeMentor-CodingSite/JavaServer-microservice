@@ -24,6 +24,14 @@ jobs:
         id: timestamp
         run: echo "::set-output name=timestamp::$(date '+%Y%m%d%H%M%S%3N')"
         
+      - name: Create default application.yml
+        run: |
+          mkdir -p ${{env.working-directory}}/src/main/resources
+          touch ${{env.working-directory}}/src/main/resources/application.yml
+          
+          echo "${{ vars.USER_APPLICATION_YML }}" >> ${{env.working-directory}}/src/main/resources/application.yml
+        shell: bash
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         shell: bash

@@ -27,7 +27,7 @@ public class QuestionLanguage {
     private Language language;
 
     @Column(name = "question_init_content", columnDefinition = "TEXT")
-    private String initContnet;
+    private String initContent;
 
     @Column(name = "answer_check_content", columnDefinition = "TEXT")
     private String checkContent;

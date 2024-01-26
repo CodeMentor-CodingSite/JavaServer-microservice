@@ -1,0 +1,71 @@
+name: evaluate
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'evaluation/**'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./evaluation
+
+    steps:
+      # checkout 설명 https://www.daleseo.com/github-actions-checkout/
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get current timestamp
+        id: timestamp
+        run: echo "::set-output name=timestamp::$(date '+%Y%m%d%H%M%S%3N')"
+        
+      - name: Create default application.yml
+        run: |
+          mkdir -p ${{env.working-directory}}/src/main/resources
+          touch ${{env.working-directory}}/src/main/resources/application.yml
+          
+          echo "${{ vars.EVALUATION_APPLICATION_YML }}" >> ${{env.working-directory}}/src/main/resources/application.yml
+        shell: bash
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        shell: bash
+        working-directory: ${{env.working-directory}}
+
+      - name: Build with Gradle
+        run: ./gradlew bootjar -x test
+        shell: bash
+        working-directory: ${{env.working-directory}}
+
+      - name: Docker Image Build
+        run: docker build -t lkh66913/codementor-evaluation:${{ steps.timestamp.outputs.timestamp }} .
+        working-directory: ${{env.working-directory}}
+
+      - name: Docker Hub Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Hub Push
+        run: docker push lkh66913/codementor-evaluation:${{ steps.timestamp.outputs.timestamp }}
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: ${{ secrets.GKE_SA_KEY }}
+
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          
+      - name: Deploy to GKE
+        run: |
+          kubectl set image deployment/codementor-evaluation-deployment codementor-evaluation=lkh66913/codementor-evaluation:${{ steps.timestamp.outputs.timestamp }} -n springboot

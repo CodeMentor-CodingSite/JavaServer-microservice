@@ -1,115 +1,112 @@
 package com.codementor.question.service;
 
-
-import com.codementor.question.dto.ConverterInputRequest;
-import com.codementor.question.dto.QuestionCodeInputRequest;
-import com.codementor.question.dto.QuestionInputRequest;
-import com.codementor.question.dto.TestCaseRequest;
-import com.codementor.question.entity.*;
-import com.codementor.question.repository.*;
+import com.codementor.question.dto.external.UserQuestionsStatus;
+import com.codementor.question.dto.PlanDto;
+import com.codementor.question.dto.response.PlanResponse;
+import com.codementor.question.dto.response.QuestionDetailDtoResponse;
+import com.codementor.question.dto.QuestionDto;
+import com.codementor.question.dto.response.QuestionInitCodeResponse;
+import com.codementor.question.entity.Question;
+import com.codementor.question.entity.QuestionLanguage;
+import com.codementor.question.enums.UserSolvedStatus;
+import com.codementor.question.mapper.QuestionMapper;
+import com.codementor.question.repository.PlanMapRepository;
+import com.codementor.question.repository.PlanRepository;
+import com.codementor.question.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
+
+    @Value("$server.execute.url")
+    private String executeUrl;
+
     private final QuestionRepository questionRepository;
-    private final LanguageRepository languageRepository;
-    private final QuestionLanguageRepository questionLanguageRepository;
-    private final QuestionTestCaseRepository questionTestCaseRepository;
-    private final QuestionTestCaseDetailRepository questionTestCaseDetailRepository;
-    private final CodeExecConverterRepository codeExecConverterRepository;
-    private final QuestionConstraintRepository questionConstraintRepository;
-    private final ConverterMapRepository converterMapRepository;
+    private final PlanRepository planRepository;
+    private final PlanMapRepository planMapRepository;
 
-    @Transactional
-    public Integer questionInput(QuestionInputRequest request) {
-        Question question = Question.builder()
-                .title(request.getQuestionTitle())
-                .content(request.getQuestionContent())
-                .category(request.getQuestionCategory())
-                .build();
-        Question response = questionRepository.save(question);
+    private RestTemplate restTemplate;
 
-        for (int i = 0; i < request.getQuestionConstraintContents().size(); i++) {
-            QuestionConstraint questionConstraint = QuestionConstraint.builder()
-                    .question(response)
-                    .content(request.getQuestionConstraintContents().get(i))
-                    .build();
-            questionConstraintRepository.save(questionConstraint);
-        }
+    /**
+     * 페이지네이션을 통해 문제를 불러오고, 유저가 푼 문제인지에 대한 status를 포함한 dto 반환
+     * @param userId 유저 아이디
+     * @param pageable 페이지네이션 정보
+     * @return 페이지네이션된 문제 dto
+     */
+    public Page<QuestionDto> getPaginatedQuestionDtos(Long userId, Pageable pageable){
+        UserQuestionsStatus userQuestionsStatus = getuserQuestionsStatus(executeUrl + "/api/external/question/get/user/status", userId);
+        HashSet<Long> userSolvedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getAttmptedQuestions());
+        HashSet<Long> userAttemptedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getSolvedQuestions());
 
-        return response.getId().intValue();
-    }
+        Page<Question> questionPage = questionRepository.findAll(pageable);
+        List<QuestionDto> questionDtos = new ArrayList<>();
 
-    @Transactional
-    public Integer testCaseInput(TestCaseRequest request) {
-        Question question = questionRepository.findById((long) request.getQuestionId()).orElseThrow();
-
-        QuestionTestCase questionTestCase = QuestionTestCase.builder()
-                .question(question)
-                .isExample(request.getIsExample())
-                .explanation(request.getExplanation())
-                .build();
-        QuestionTestCase questionTestCaseResponse = questionTestCaseRepository.save(questionTestCase);
-
-        // 각 TestCaseDetail에 ConverterMap 저장
-        for (int i = 0; i < request.getTestCaseDetailDTOs().size(); i++) {
-            QuestionTestCaseDetail questionTestCaseDetail = QuestionTestCaseDetail.builder()
-                    .questionTestCase(questionTestCaseResponse)
-                    .key(request.getTestCaseDetailDTOs().get(i).getTestCaseKey())
-                    .value(request.getTestCaseDetailDTOs().get(i).getTestCaseValue())
-                    .build();
-            questionTestCaseDetailRepository.save(questionTestCaseDetail);
-
-            ArrayList<Integer> converterIds = request.getTestCaseDetailDTOs().get(i).getConverterIds();
-
-            // 각 TestCaseDetailId와 ConverterId를 ConverterMap에 저장
-            for (Integer converterId : converterIds) {
-                CodeExecConverter codeExecConverter = codeExecConverterRepository.findById((long) converterId).orElseThrow();
-                ConverterMap converterMap = ConverterMap.builder()
-                        .questionTestCaseDetail(questionTestCaseDetail)
-                        .codeExecConverter(codeExecConverter)
-                        .build();
-                converterMapRepository.save(converterMap);
+        for (Question question : questionPage.getContent()) {
+            UserSolvedStatus userSolvedStatus = UserSolvedStatus.FIRST;
+            if (userSolvedQuestionIdsSet.contains(question.getId())) {
+                userSolvedStatus = UserSolvedStatus.SOLVED;
+            } else if (userAttemptedQuestionIdsSet.contains(question.getId())) {
+                userSolvedStatus = UserSolvedStatus.ATTEMPTED;
             }
+            questionDtos.add(QuestionDto.from(question, userSolvedStatus));
         }
 
-        return questionTestCaseResponse.getId().intValue();
+        return new PageImpl<>(questionDtos, pageable, questionPage.getTotalElements());
     }
 
-    @Transactional
-    public Integer converterInput(ConverterInputRequest request) {
-        Language languageEntity = languageRepository.findByType(request.getLanguageType()).orElseThrow();
-
-        CodeExecConverter codeExecConverter = CodeExecConverter.builder()
-                .language(languageEntity)
-                .content(request.getCodeExecConverterContent())
-                .returnType(request.getResultType())
-                .methodName(request.getMethodName())
-                .build();
-
-        CodeExecConverter response = codeExecConverterRepository.save(codeExecConverter);
-        return response.getId().intValue();
+    private UserQuestionsStatus getuserQuestionsStatus(String url, Long userId) {
+        ResponseEntity<UserQuestionsStatus> response = restTemplate.postForEntity(url, userId, UserQuestionsStatus.class);
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            return response.getBody();
+        } else {
+            throw new RuntimeException("Failed to get valid response from " + url);
+        }
     }
 
-    @Transactional
-    public Integer questionCodeInput(QuestionCodeInputRequest request) {
-        Question question = questionRepository.findById((long)request.getQuestionId()).orElseThrow();
-        Language language = languageRepository.findByType(request.getLanguageType()).orElseThrow();
-
-        QuestionLanguage questionLanguage = QuestionLanguage.builder()
-                .question(question)
-                .language(language)
-                .initContnet(request.getQuestionInitContent())
-                .checkContent(request.getAnswerCheckContent())
-                .build();
-
-        QuestionLanguage response = questionLanguageRepository.save(questionLanguage);
-        return response.getId().intValue();
+    /**
+     * 문제를 id로 조회하여 해당 entity를 dto로 변환하여 반환
+     * language는 entity가 아닌 List<String> 값으로 반환
+     * @param questionId 문제 아이디
+     * @return 문제 dto
+     */
+    public QuestionDetailDtoResponse getQuestionById(Long questionId) {
+        Question question = questionRepository.findById(questionId).orElseThrow(() -> new RuntimeException("Question not found"));
+        return QuestionMapper.toDto(question);
     }
 
+    /**
+     * 문제의 초기 코드를 반환
+     * @param questionId 문제 아이디
+     * @param language 언어
+     * @return 초기 코드
+     */
+    public QuestionInitCodeResponse getQuestionInitialCode(Long questionId, String language) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        QuestionLanguage questionLanguage = question.getQuestionLanguages().stream()
+                .filter(ql -> ql.getLanguage()!= null && language.equals(ql.getLanguage().getType()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Question language not found"));
+        return new QuestionInitCodeResponse(questionLanguage.getInitContent());
+    }
+
+    /**
+     * PlanEntity를 PlanDto로 변환하여 반환
+     * @return PlanResponse
+     */
+    public PlanResponse getAllPlans() {
+        return new PlanResponse(planRepository.findAll());
+    }
 }
