@@ -2,7 +2,8 @@ package com.codementor.user.service;
 
 import com.codementor.user.config.JwtProvider;
 import com.codementor.user.dto.TokenDTO;
-import com.codementor.user.dto.UserDTO;
+import com.codementor.user.dto.UserCreateDTO;
+import com.codementor.user.dto.UserLoginDTO;
 import com.codementor.user.dto.UserProfileDTO;
 import com.codementor.user.entity.User;
 import com.codementor.user.exception.UserErrorEnum;
@@ -24,20 +25,22 @@ public class UserService {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public UserDTO createUser(UserDTO userDTO) {
-        checkExistedUser(userDTO);
+    public String createUser(UserCreateDTO userCreateDTO) {
+        checkExistedUser(userCreateDTO);
 
-        User user = UserDTO.toEntity(userDTO).encodePassword(passwordEncoder);
+        User user = UserCreateDTO.toEntity(userCreateDTO).encodePassword(passwordEncoder);
 
-        return UserDTO.toDTO(userRepository.save(user));
+        userRepository.save(user);
+
+        return "Success";
     }
 
     @Transactional
-    public TokenDTO doLogin(UserDTO userDTO) {
-        User responseUser = userRepository.findByEmail(userDTO.getEmail())
+    public TokenDTO doLogin(UserLoginDTO userLoginDTO) {
+        User responseUser = userRepository.findByEmail(userLoginDTO.getEmail())
                 .orElseThrow(() -> new UserException(UserErrorEnum.INVALID_LOGIN_EMAIL));
 
-        if (!responseUser.isMatchPassword(userDTO.getPassword(), passwordEncoder)) {
+        if (!responseUser.isMatchPassword(userLoginDTO.getPassword(), passwordEncoder)) {
             throw new UserException(UserErrorEnum.INVALID_LOGIN_PASSWORD);
         }
 
@@ -74,11 +77,11 @@ public class UserService {
         return Long.valueOf(claims.get("id").toString());
     }
 
-    private void checkExistedUser(UserDTO userDTO) {
-        if (userRepository.existsByEmail(userDTO.getEmail()))
+    private void checkExistedUser(UserCreateDTO userCreateDTO) {
+        if (userRepository.existsByEmail(userCreateDTO.getEmail()))
             throw new UserException(UserErrorEnum.EXIST_EMAIL);
 
-        if (userRepository.existsByNickname(userDTO.getNickname()))
+        if (userRepository.existsByNickname(userCreateDTO.getNickname()))
             throw new UserException(UserErrorEnum.EXIST_NICKNAME);
     }
 
