@@ -32,5 +32,4 @@ public class EvaluationDto {
     private Long executeTime;
     private List<String> testCaseResults;
     private String gptEvaluation;
-
 }
