@@ -1,7 +1,8 @@
 package com.codementor.user.controller;
 
 import com.codementor.user.dto.TokenDTO;
-import com.codementor.user.dto.UserDTO;
+import com.codementor.user.dto.UserCreateDTO;
+import com.codementor.user.dto.UserLoginDTO;
 import com.codementor.user.dto.UserProfileDTO;
 import com.codementor.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +19,20 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        return new ResponseEntity<>(userService.createUser(userDTO), HttpStatus.CREATED);
+    public ResponseEntity<String> createUser(@RequestBody UserCreateDTO userCreateDTO) {
+        String message = userService.createUser(userCreateDTO);
+
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> doLogin(@RequestBody UserDTO userDTO, HttpServletResponse response) {
-        TokenDTO tokenDTO = userService.doLogin(userDTO);
+    public ResponseEntity<TokenDTO> doLogin(@RequestBody UserLoginDTO userLoginDTO, HttpServletResponse response) {
+        TokenDTO tokenDTO = userService.doLogin(userLoginDTO);
 
         response.addHeader("access_token", tokenDTO.getAccessToken());
         response.addHeader("refresh_token", tokenDTO.getRefreshToken());
 
-        return new ResponseEntity<>(tokenDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
     }
 
     @GetMapping("/users")
