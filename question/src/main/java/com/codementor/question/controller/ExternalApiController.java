@@ -18,6 +18,7 @@ public class ExternalApiController {
 
     @PostMapping("/api/external/execute")
     public ResponseEntity<EvaluationDto> evalQuestion(EvalQuestionRequest evalQuestionRequest) {
+        System.out.println("EvaluationDto received");
         EvaluationDto evaluationDto = executionHelperService.createEvaluationDto(evalQuestionRequest.getQuestionId(), evalQuestionRequest.getUserLanguage());
         return ResponseEntity.ok(evaluationDto);
     }
@@ -25,11 +26,13 @@ public class ExternalApiController {
 
     @PostMapping("/api/external/getQuestionsDifficultyCounts")
     public QuestionDifficultyCounts getQuestionsDifficultyCounts(){
+        System.out.println("QuestionDifficultyCounts received");
         return executionHelperService.getQuestionsDifficultyCounts();
     }
 
     @PostMapping("/api/external/getUserSolvedCounts")
     public UserSolvedRatioTotalDto getUserSolvedCounts(UserSolvedRatioTotalDto req){
+        System.out.println("UserSolvedRatioTotalDto received");
         return executionHelperService.getUserSolvedRatioSubmitDto(req);
     }
 
