@@ -1,6 +1,7 @@
 package com.codementor.user.entity;
 
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "user")
+@SQLDelete(sql = "UPDATE user SET user_status = 'CLOSE' WHERE user_id = ?")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
