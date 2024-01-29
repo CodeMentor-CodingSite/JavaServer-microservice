@@ -58,7 +58,7 @@ public class UserCodeExecutionRequestProducer {
     }
 
 
-    private EvaluationDto getQuestionDataFromQuestionServer(String url, EvalQuestionRequest request) {
+    public EvaluationDto getQuestionDataFromQuestionServer(String url, EvalQuestionRequest request) {
         ResponseEntity<EvaluationDto> response = restTemplate.postForEntity(url, request, EvaluationDto.class);
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             return response.getBody();
