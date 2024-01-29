@@ -44,6 +44,12 @@ public class UserController {
         TokenDTO tokenDTO = userService.reissueToken(token);
 
         return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+    }
 
+    @DeleteMapping("/users")
+    public ResponseEntity<TokenDTO> deleteUser(@RequestHeader("id") Long id) {
+        userService.deleteUser(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -55,6 +55,11 @@ public class UserService {
     }
 
     @Transactional
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    @Transactional
     public TokenDTO reissueToken(String token) {
         User foundUser = userRepository.findById(getUserIdInToken(token))
                 .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
