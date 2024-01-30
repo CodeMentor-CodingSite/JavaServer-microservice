@@ -17,10 +17,11 @@ public class ExternalApiController {
 
 
     @PostMapping("/api/external/execute")
-    public ResponseEntity<EvaluationDto> evalQuestion(EvalQuestionRequest evalQuestionRequest) {
+    public EvaluationDto evalQuestion(EvalQuestionRequest evalQuestionRequest) {
         System.out.println("EvaluationDto received");
+        System.out.println(evalQuestionRequest.toString());
         EvaluationDto evaluationDto = executionHelperService.createEvaluationDto(evalQuestionRequest.getQuestionId(), evalQuestionRequest.getUserLanguage());
-        return ResponseEntity.ok(evaluationDto);
+        return evaluationDto;
     }
 
 
