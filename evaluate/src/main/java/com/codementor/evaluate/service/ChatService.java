@@ -82,7 +82,7 @@ public class ChatService {
         for (int i = 0; i < questionTestCaseDtoList.size(); i++) {
             gptPrompt += "테스트 케이스 " + (i + 1) + ": \n";
 
-            List<EvalQuestionTestCaseDetailAndConverterDto> tcAndcDtoList = questionTestCaseDtoList.get(i).getEvalQuestionTestCaseDetailAndConverterDtos();
+            List<EvalQuestionTestCaseDetailAndConverterDto> tcAndcDtoList = questionTestCaseDtoList.get(i).getEvalTestCaseDetailAndConverterDtos();
             for (EvalQuestionTestCaseDetailAndConverterDto tcAndcDto : tcAndcDtoList) {
                 gptPrompt += tcAndcDto.getTestCaseKey() + "=" + tcAndcDto.getTestCaseValue() + "\n";
             }
@@ -119,6 +119,8 @@ public class ChatService {
      * @return String 은 OpenAI API로부터의 응답
      * @throws Exception 요청이 실패할 경우 예외가 발생
      */
+
+    //Todo: Gpt Response에서 meesage.content만 받기
     public String davinciResponse(String message) throws Exception {
         System.out.println("davinci-003 called");
 
@@ -129,16 +131,20 @@ public class ChatService {
         MessageDTO messageDTO = new MessageDTO("user", message);
         ChatGptRequestDTO chatGptRequestDTO = new ChatGptRequestDTO(gptModel, temperature, Collections.singletonList(messageDTO));
 
-        String payload = objectMapper.writeValueAsString(chatGptRequestDTO);
-        HttpEntity<String> requestEntity = new HttpEntity<>(payload, headers);
+        try {
+            String payload = objectMapper.writeValueAsString(chatGptRequestDTO);
+            HttpEntity<String> requestEntity = new HttpEntity<>(payload, headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(chatGptUrl, requestEntity, String.class);
-        ChatGptResponseDTO response = objectMapper.readValue(responseEntity.getBody(), ChatGptResponseDTO.class);
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(chatGptUrl, requestEntity, String.class);
 
-        String result = response.getChoices().get(0).getMessage().getContent().trim();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(result);
-        String responseContent = rootNode.path("response").asText();
-        return responseContent;
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                // Directly return the response body as a string
+                return responseEntity.getBody();
+            }
+        } catch (Exception e) {
+            // Handle specific exceptions
+            e.printStackTrace();
+        }
+        return null; // or some default value or throw a custom exception
     }
 }

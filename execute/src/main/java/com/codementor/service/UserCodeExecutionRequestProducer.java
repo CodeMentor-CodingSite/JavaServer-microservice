@@ -46,12 +46,12 @@ public class UserCodeExecutionRequestProducer {
     }
 
     private EvaluationDto createEvaluationDto(UserCodeExecutionRequest userCodeExecutionRequest) {
-        EvalQuestionRequest questionRequest = EvalQuestionRequest.builder()
+        EvalQuestionRequest evalQuestionRequest = EvalQuestionRequest.builder()
                 .questionId(userCodeExecutionRequest.getQuestionId())
                 .userLanguage(userCodeExecutionRequest.getUserLanguage())
                 .build();
-
-        EvaluationDto evaluationDto = getQuestionDataFromQuestionServer(questionUrl+ "/api/external/execute", questionRequest);
+        System.out.println(evalQuestionRequest.toString());
+        EvaluationDto evaluationDto = getQuestionDataFromQuestionServer(questionUrl+ "/api/external/execute", evalQuestionRequest);
         evaluationDto.setUserId(userCodeExecutionRequest.getUserId());
         evaluationDto.setUserLanguage(userCodeExecutionRequest.getUserLanguage());
         evaluationDto.setUserCode(userCodeExecutionRequest.getUserCode());

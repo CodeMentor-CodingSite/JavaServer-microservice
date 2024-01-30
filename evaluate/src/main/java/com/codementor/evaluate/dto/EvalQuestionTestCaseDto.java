@@ -14,5 +14,5 @@ public class EvalQuestionTestCaseDto {
     private Long testCaseId;
     private Boolean isExample;
     private String explanation;
-    private List<EvalQuestionTestCaseDetailAndConverterDto> evalQuestionTestCaseDetailAndConverterDtos;
+    private List<EvalQuestionTestCaseDetailAndConverterDto> evalTestCaseDetailAndConverterDtos;
 }

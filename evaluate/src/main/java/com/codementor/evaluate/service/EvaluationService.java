@@ -2,16 +2,12 @@ package com.codementor.evaluate.service;
 
 import com.codementor.evaluate.dto.EvalQuestionTestCaseDetailAndConverterDto;
 import com.codementor.evaluate.dto.EvalQuestionTestCaseDto;
-import com.codementor.evaluate.dto.request.CodeExecutionConverterDto;
 import com.codementor.evaluate.dto.EvaluationDto;
-import com.codementor.evaluate.dto.request.QuestionTestCaseDetailsDto;
-import com.codementor.evaluate.dto.request.QuestionTestCaseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.ToDoubleBiFunction;
 
 /**
  * 코드 실행 서버와 관련된 서비스
@@ -57,7 +53,7 @@ public class EvaluationService {
 
         for (EvalQuestionTestCaseDto questionTestCaseDto : questionTestCaseDtoList) {
             String pythonScript = "";
-            List<EvalQuestionTestCaseDetailAndConverterDto> questionTestCaseDetailsDtoList = questionTestCaseDto.getEvalQuestionTestCaseDetailAndConverterDtos();
+            List<EvalQuestionTestCaseDetailAndConverterDto> questionTestCaseDetailsDtoList = questionTestCaseDto.getEvalTestCaseDetailAndConverterDtos();
 
             // 유저 코드 입력
             pythonScript += userCode;

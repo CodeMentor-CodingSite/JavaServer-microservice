@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Controller
@@ -17,7 +18,7 @@ public class ExternalApiController {
 
 
     @PostMapping("/api/external/execute")
-    public EvaluationDto evalQuestion(EvalQuestionRequest evalQuestionRequest) {
+    public EvaluationDto evalQuestion(@RequestBody EvalQuestionRequest evalQuestionRequest) {
         System.out.println("EvaluationDto received");
         System.out.println(evalQuestionRequest.toString());
         EvaluationDto evaluationDto = executionHelperService.createEvaluationDto(evalQuestionRequest.getQuestionId(), evalQuestionRequest.getUserLanguage());
@@ -32,13 +33,13 @@ public class ExternalApiController {
     }
 
     @PostMapping("/api/external/getUserSolvedCounts")
-    public UserSolvedRatioTotalDto getUserSolvedCounts(UserSolvedRatioTotalDto req){
+    public UserSolvedRatioTotalDto getUserSolvedCounts(@RequestBody UserSolvedRatioTotalDto req){
         System.out.println("UserSolvedRatioTotalDto received");
         return executionHelperService.getUserSolvedRatioSubmitDto(req);
     }
 
     @PostMapping("/api/external/getUserSolvedCategory")
-    public UserSolvedCategoryDtoList getUserSolvedCategory(UserSolvedQuestionIdList req){
+    public UserSolvedCategoryDtoList getUserSolvedCategory(@RequestBody UserSolvedQuestionIdList req){
         return executionHelperService.getUserSolvedCategoryQuestionList(req);
     }
 }
