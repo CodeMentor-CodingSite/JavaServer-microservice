@@ -8,6 +8,7 @@ import com.codementor.repository.ExecuteUsercodeRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -26,6 +27,8 @@ public class UserCodeExecutionRequestProducer {
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ExecuteUsercodeRepository executeUsercodeRepository;
+
+    @Autowired
     private RestTemplate restTemplate;
 
     private static final String TOPIC_NAME = "usercode.request.topic.v1";
@@ -59,12 +62,8 @@ public class UserCodeExecutionRequestProducer {
 
 
     public EvaluationDto getQuestionDataFromQuestionServer(String url, EvalQuestionRequest request) {
-        ResponseEntity<EvaluationDto> response = restTemplate.postForEntity(url, request, EvaluationDto.class);
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to get valid response from " + url);
-        }
+        EvaluationDto response = restTemplate.postForObject(url, request, EvaluationDto.class);
+        return response;
     }
 
     private void sendToKafka(EvaluationDto evaluationDto) {

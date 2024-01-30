@@ -10,6 +10,8 @@ public class TestController {
 
     @Value("${server.question.url}")
     private String questionUrl;
+
+    @Autowired
     private RestTemplate restTemplate;
 
     @PostMapping("/api/execute/send-to-question")
