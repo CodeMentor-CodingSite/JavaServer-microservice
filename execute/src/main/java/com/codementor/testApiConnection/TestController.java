@@ -7,15 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 public class TestController {
-    private final RestTemplate restTemplate;
 
     @Value("${server.question.url}")
     private String questionUrl;
-
-    @Autowired
-    public TestController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    private RestTemplate restTemplate;
 
     @PostMapping("/api/execute/send-to-question")
     public ReceiveDto sendToQuestion(@RequestBody SendDto sendDto) {

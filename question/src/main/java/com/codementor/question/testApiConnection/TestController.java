@@ -8,12 +8,6 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class TestController {
-    private final RestTemplate restTemplate;
-
-    @Autowired
-    public TestController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     @PostMapping("/api/question/test")
     public ReceiveDto sendToQuestion(@RequestBody SendDto sendDto) {
