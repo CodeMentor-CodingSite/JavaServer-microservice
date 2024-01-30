@@ -28,4 +28,10 @@ public class TestController {
         System.out.println("");
         return receive;
     }
+
+    @GetMapping("/api/execute/send-to-question")
+    public String test(){
+        System.out.println("test");
+        return "test";
+    }
 }

@@ -15,7 +15,7 @@ public class TestController {
         this.restTemplate = restTemplate;
     }
 
-    @PostMapping("/api/execute/send-to-question")
+    @PostMapping("/api/question/test")
     public ReceiveDto sendToQuestion(@RequestBody SendDto sendDto) {
         System.out.println("");
         System.out.println("received dto from execute server");
