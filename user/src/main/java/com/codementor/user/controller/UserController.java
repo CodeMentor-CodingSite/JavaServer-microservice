@@ -42,7 +42,7 @@ public class UserController {
         return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/reissue")
+    @PostMapping("/reissue")
     public ResponseEntity<TokenDTO> reissueToken(@RequestHeader("refresh_token") String token) {
         TokenDTO tokenDTO = userService.reissueToken(token);
 
@@ -54,5 +54,12 @@ public class UserController {
         userService.deleteUser(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> doLogout(@RequestHeader("Authorization") String token) {
+        String message = userService.doLogout(token);
+
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 }

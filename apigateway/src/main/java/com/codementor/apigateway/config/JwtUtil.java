@@ -2,10 +2,13 @@ package com.codementor.apigateway.config;
 
 import com.codementor.apigateway.exception.TokenErrorEnum;
 import com.codementor.apigateway.exception.TokenException;
+import com.codementor.apigateway.service.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -14,15 +17,24 @@ import org.springframework.web.server.ServerWebExchange;
 import java.security.Key;
 
 @Configuration
+@RequiredArgsConstructor
 public class JwtUtil {
+
+    private final RedisService redisService;
+
     private final Key key;
 
-    public JwtUtil(@Value("${token.secret}") String tokenSecret) {
+    @Autowired
+    public JwtUtil(RedisService redisService, @Value("${token.secret}") String tokenSecret) {
+        this.redisService = redisService;
         key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(tokenSecret));
     }
 
     public void validateToken(String token, ServerWebExchange exchange, String role) {
         Claims claims = parseTokenToClaims(token);
+        String id = claims.get("id").toString();
+        String value = redisService.getValue(id);
+        if (redisService.checkExistsValue(value)) throw new TokenException(TokenErrorEnum.LOGOUT_TOKEN);
 
         if (role.equals("admin")) checkAdminRole(claims);
 

@@ -1,19 +1,28 @@
 package com.codementor.user.config;
 
 import com.codementor.user.entity.UserRole;
+import com.codementor.user.exception.UserErrorEnum;
+import com.codementor.user.exception.UserException;
+import com.codementor.user.service.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
+
+
     @Value("${token.access-token-expiretime}")
     public int ACCESS_TOKEN_EXPIRETIME;
 
@@ -22,7 +31,12 @@ public class JwtProvider {
 
     private final Key key;
 
-    public JwtProvider(@Value("${token.secret}") String tokenSecret) {
+    private final RedisService redisService;
+
+
+    @Autowired
+    public JwtProvider(RedisService redisService, @Value("${token.secret}") String tokenSecret) {
+        this.redisService = redisService;
         key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(tokenSecret));
     }
 
@@ -44,7 +58,7 @@ public class JwtProvider {
     public String createRefreshToken(Long id, String email, UserRole role) {
         Date date = new Date();
 
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setIssuer("codementor")
                 .setIssuedAt(date)
@@ -54,6 +68,10 @@ public class JwtProvider {
                 .claim("role", role)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        redisService.setValue(String.valueOf(id), refreshToken, Duration.ofMillis(REFRESH_TOKEN_EXPIRETIME));
+
+        return refreshToken;
     }
 
     public Claims parseTokenToClaims(String token) {
@@ -64,4 +82,36 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public Long validateRefreshToken(String token) {
+        Claims claims = parseTokenToClaims(token);
+        String id = claims.get("id").toString();
+        String value = redisService.getValue(id);
+
+        if (redisService.checkExistsValue(value)) throw new UserException(UserErrorEnum.NOT_FOUND_REFRESH_TOKEN);
+
+        return Long.valueOf(id);
+    }
+
+    public Long validateAccessToken(String token) {
+        Claims claims = parseTokenToClaims(token);
+        String id = claims.get("id").toString();
+
+        return Long.valueOf(id);
+    }
+
+    public void deleteRefreshToken(Long id) {
+        redisService.deleteValues(String.valueOf(id));
+    }
+
+    public void setBlackListAccessToken(Long id, String accessToken) {
+        long expiredAccessTokenTime = getExpiredTime(accessToken).getTime() - new Date().getTime();
+        redisService.setValue("blackList" + id, accessToken, Duration.ofMillis(expiredAccessTokenTime));
+    }
+
+    private Date getExpiredTime(String accessToken) {
+        Claims claims = parseTokenToClaims(accessToken);
+        return claims.getExpiration();
+    }
 }
+
