@@ -1,11 +1,13 @@
 package com.codementor.controller;
 
+import com.codementor.core.dto.ResponseDto;
 import com.codementor.dto.request.UserCodeExecutionRequest;
 import com.codementor.service.SseConnectionService;
 import com.codementor.service.UserCodeExecutionRequestProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -23,7 +25,7 @@ public class ExecuteUsercodeController {
      * @return SseEmitter
      */
     @PostMapping("/api/openSseConnection")
-    public SseEmitter subscribe(String userId){
+    public SseEmitter subscribe(@RequestHeader("userId") Long userId){
         return sseConnectionService.createEmitterForUsers(userId);
     }
 
@@ -34,8 +36,8 @@ public class ExecuteUsercodeController {
      * @return 성공 메시지
      */
     @PostMapping("/api/execute/userCode")
-    public String evaluateUserCode(@RequestBody UserCodeExecutionRequest userCodeExecutionRequest) {
+    public ResponseDto evaluateUserCode(@RequestBody UserCodeExecutionRequest userCodeExecutionRequest) {
         userCodeExecutionRequestProducer.sendUserCodeExecutionRequestToKafka(userCodeExecutionRequest);
-        return "user code sent to execution kafka topic";
+        return ResponseDto.ok("user code sent to execution kafka topic");
     }
 }
