@@ -1,5 +1,9 @@
 package com.codementor.service;
 
+import com.codementor.core.exception.CodeMentorException;
+import com.codementor.core.exception.ErrorEnum;
+import com.codementor.core.util.RequestToServer;
+import com.codementor.core.util.SendToKafka;
 import com.codementor.dto.evaluation.EvalQuestionRequest;
 import com.codementor.dto.evaluation.EvaluationDto;
 import com.codementor.dto.request.UserCodeExecutionRequest;
@@ -10,8 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -23,74 +27,47 @@ public class UserCodeExecutionRequestProducer {
     @Value("${server.question.url}")
     private String questionUrl;
 
+    private final RequestToServer requestToServer;
+    private final SendToKafka sendToKafka;
 
-    private final ObjectMapper objectMapper;
-    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ExecuteUsercodeRepository executeUsercodeRepository;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
     private static final String TOPIC_NAME = "usercode.request.topic.v1";
-
     private static final String GROUP_ID = "usercode.request.group.v1";
 
 
     /**
-     * 유저의 코드 실행 요청을 카프카로 보낸다.
+     * 유저의 코드 실행 요청을 평가 전에 저장한다.
+     * EvaluationDto를 카프카로 보낸다.
      * @param userCodeExecutionRequest 유저의 코드 실행 및 문제와 관련된 데이터 객체
+     * 1. EvaluationDto를 평가전에 저장한다.
+     * 2. EvaluationDto를 평가전에 저장한다.
+     * 3. EvaluationDto를 유저의 코드 실행 요청 데이터와 저장된 executeUsercodeId로 업데이트한다.
+     * 4. EvaluationDto를 카프카로 보낸다.
      */
+    @Transactional
     public void sendUserCodeExecutionRequestToKafka(UserCodeExecutionRequest userCodeExecutionRequest) {
-        EvaluationDto evaluationDto = createEvaluationDto(userCodeExecutionRequest);
-        sendToKafka(evaluationDto);
-    }
-
-    private EvaluationDto createEvaluationDto(UserCodeExecutionRequest userCodeExecutionRequest) {
-        EvalQuestionRequest evalQuestionRequest = EvalQuestionRequest.builder()
+        EvalQuestionRequest evalQuestionRequest = EvalQuestionRequest.builder() // 1.
                 .questionId(userCodeExecutionRequest.getQuestionId())
                 .userLanguage(userCodeExecutionRequest.getUserLanguage())
                 .build();
-        System.out.println(evalQuestionRequest.toString());
-        EvaluationDto evaluationDto = getQuestionDataFromQuestionServer(questionUrl+ "/api/external/execute", evalQuestionRequest);
-        evaluationDto.setUserId(userCodeExecutionRequest.getUserId());
-        evaluationDto.setUserLanguage(userCodeExecutionRequest.getUserLanguage());
-        evaluationDto.setUserCode(userCodeExecutionRequest.getUserCode());
-        Integer executeUserCodeId = saveEvaluationDtoBeforeEvaluation(evaluationDto);
-        evaluationDto.setExecuteUserCodeId(executeUserCodeId.longValue());
-        return evaluationDto;
-    }
 
+//        System.out.println(evalQuestionRequest.toString());
+        String questionDataFromQuestionServerUrl = questionUrl + "/api/external/execute";
+        EvaluationDto evaluationDto = requestToServer.postDataToServer(
+                questionDataFromQuestionServerUrl,
+                evalQuestionRequest,
+                EvaluationDto.class);
 
-    public EvaluationDto getQuestionDataFromQuestionServer(String url, EvalQuestionRequest request) {
-        EvaluationDto response = restTemplate.postForObject(url, request, EvaluationDto.class);
-        return response;
-    }
-
-    private void sendToKafka(EvaluationDto evaluationDto) {
-        System.out.println("Producer: " + evaluationDto);
-        try{
-            String jsonInString = objectMapper.writeValueAsString(evaluationDto);
-            kafkaTemplate.send(TOPIC_NAME, jsonInString);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Saves executeUsercode before evaluation
-     * @param evaluationDto evaluationDto without evaluation
-     * @return id of saved executeUsercode
-     */
-    @Transactional
-    public Integer saveEvaluationDtoBeforeEvaluation(EvaluationDto evaluationDto) {
-        ExecuteUsercode executeUsercode = ExecuteUsercode.builder()
+        ExecuteUsercode executeUsercode = ExecuteUsercode.builder() // 2.
                 .questionId(evaluationDto.getQuestionId())
                 .userLanguage(evaluationDto.getUserLanguage())
                 .userCode(evaluationDto.getUserCode())
                 .build();
+        Long executeUsercodeId = executeUsercodeRepository.save(executeUsercode).getId();
 
-        ExecuteUsercode response = executeUsercodeRepository.save(executeUsercode);
-        return response.getId().intValue();
+        evaluationDto.updateWith(userCodeExecutionRequest, executeUsercodeId); // 3.
+
+        sendToKafka.sendData(TOPIC_NAME, evaluationDto); // 4.
     }
-
 }
