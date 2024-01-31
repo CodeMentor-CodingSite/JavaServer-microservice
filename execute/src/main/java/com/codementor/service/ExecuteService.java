@@ -1,5 +1,8 @@
 package com.codementor.service;
 
+import com.codementor.core.exception.CodeMentorException;
+import com.codementor.core.exception.ErrorEnum;
+import com.codementor.core.util.RequestToServer;
 import com.codementor.dto.UserSolvedCategoryDtoList;
 import com.codementor.dto.UserSolvedRatioSubmitDto;
 import com.codementor.dto.UserSolvedRatioTotalDto;
@@ -8,6 +11,7 @@ import com.codementor.dto.external.UserSolvedQuestionIdList;
 import com.codementor.entity.ExecuteUsercode;
 import com.codementor.repository.ExecuteUsercodeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,46 +27,53 @@ public class ExecuteService {
     @Value("${server.question.url}")
     private String questionUrl;
 
+    private final RequestToServer requestToServer;
+
     private final ExecuteUsercodeRepository executeUsercodeRepository;
 
+    @Autowired
     private RestTemplate restTemplate;
 
     /**
-     * 유저가 푼 문제 수와 제출한 문제 수를 가져온다. (비율 계산)
+     * 유저가 푼 문제 수와 제출한 문제 수를 가져온다.
      * @param userId 유저 아이디
      * @return 유저가 푼 문제 수와 제출한 문제 수
      */
-    public UserSolvedRatioSubmitDto getUserSolvedRatioSubmit(Long userId){
+    public UserSolvedRatioSubmitDto getUserSolvedRatioSubmit(Long userId) {
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
+
         Long userSolved = executeUsercodeList.stream().filter(ExecuteUsercode::getIsCorrect).count();
         Long userSubmitted = (long) executeUsercodeList.size();
-        return new UserSolvedRatioSubmitDto(userSolved, userSubmitted);
-    }
 
+        return UserSolvedRatioSubmitDto.builder()
+                .userProblemSolvedCount(userSolved)
+                .userProblemSubmittedCount(userSubmitted)
+                .build();
+    }
 
     /**
      * 유저가 푼 문제 수와 전체 문제 수를 가져온다.
      * @param userId 유저 아이디
      * @return 유저가 푼 문제 수와 전체 문제 수
+     * 1. 풀었던 문제 엔터티 리스트를 가져온다.
+     * 2. 총 맞은 문제들을 보내고, 맞은 문제들을 난이도별로 분류하여 카운트한 Dto를 받아온다.
+     * 3. 총 문제 수를 받는다
+     * 4. 총 풀었던 문제 수를 업데이트한다.
      */
-    public UserSolvedRatioTotalDto getUserSolvedRatioTotal(Long userId){
-        // 풀었던 문제 아이디를 가져온다.
-        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
-        List<Long> correctQuestionIdList = executeUsercodeList.stream()
-                .filter(ExecuteUsercode::getIsCorrect)
-                .map(ExecuteUsercode::getQuestionId)
-                .collect(Collectors.toList());
+    public UserSolvedRatioTotalDto getUserSolvedRatioTotal(Long userId) {
+        List<Long> correctQuestionIdList = getSolvedExecuteUserCodeList(userId); // 1.
 
+        UserSolvedRatioTotalDto sendDto = UserSolvedRatioTotalDto.builder() // 2.
+                .userId(userId)
+                .questionIdList(correctQuestionIdList)
+                .build();
+        String userSolvedCountsUrl = questionUrl + "/api/external/getUserSolvedCounts";
+        UserSolvedRatioTotalDto userSolvedRatioTotalDto = requestToServer.postDataToServer(userSolvedCountsUrl, sendDto, UserSolvedRatioTotalDto.class);
 
-        // 총 문제 수를 받는다
-        QuestionDifficultyCounts questionDifficultyCounts = getQuestionDifficultyCounts(questionUrl+"/api/external/getQuestionsDifficultyCounts");
-        // 총 맞은 문제를 보내고, 난이도 별 맞은 문제 수를 받아온다.
-        UserSolvedRatioTotalDto sendDto = new UserSolvedRatioTotalDto(userId, correctQuestionIdList);
-        UserSolvedRatioTotalDto userSolvedRatioTotalDto = getSolvedQuestionDataFromQuestionServer(questionUrl+"/api/external/getUserSolvedCounts", sendDto);
+        String questionDifficultyCountsUrl = questionUrl + "/api/external/getQuestionsDifficultyCounts"; // 3.
+        QuestionDifficultyCounts questionDifficultyCounts = requestToServer.postDataToServer(questionDifficultyCountsUrl, null, QuestionDifficultyCounts.class);
 
-        userSolvedRatioTotalDto.setEasyProblemSolvedCount(questionDifficultyCounts.getEasyProblemsCount());
-        userSolvedRatioTotalDto.setMediumProblemSolvedCount(questionDifficultyCounts.getMediumProblemsCount());
-        userSolvedRatioTotalDto.setHardProblemSolvedCount(questionDifficultyCounts.getHardProblemsCount());
+        userSolvedRatioTotalDto.updateProblemCountWith(questionDifficultyCounts); // 4.
 
         return userSolvedRatioTotalDto;
     }
@@ -71,44 +82,27 @@ public class ExecuteService {
      * 유저가 푼 문제에 대한 카테고리와 난이도가 포함된 정보를 가져온다.
      * @param userId 유저 아이디
      * @return 유저가 푼 문제에 대한 카테고리와 난이도가 포함된 정보
+     * 1. 풀었던 문제 엔터티 리스트를 가져온다.
+     * 2. 유저 아이디를 보내고, 문제 Id, 카테고리, 난이도가 포함된 Dto List를 받아온다.
      */
-    public UserSolvedCategoryDtoList getUserSolvedQuestion(Long userId){
-        // 풀었던 문제 아이디를 가져온다.
+    public UserSolvedCategoryDtoList getUserSolvedQuestion(Long userId) {
+        List<Long> correctQuestionIdList = getSolvedExecuteUserCodeList(userId); // 1.
+
+        UserSolvedQuestionIdList sendDto = UserSolvedQuestionIdList.builder() // 2.
+                .userId(userId)
+                .problemIdList(correctQuestionIdList)
+                .build();
+        String userSolvedCategoryUrl = questionUrl + "/api/external/getUserSolvedCategory";
+        return requestToServer.postDataToServer(userSolvedCategoryUrl, sendDto, UserSolvedCategoryDtoList.class);
+    }
+
+    //풀었던 문제 엔터티들의 Id를 가져온다.
+    private List<Long> getSolvedExecuteUserCodeList(Long userId) {
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
         List<Long> correctQuestionIdList = executeUsercodeList.stream()
                 .filter(ExecuteUsercode::getIsCorrect)
                 .map(ExecuteUsercode::getQuestionId)
                 .collect(Collectors.toList());
-
-        UserSolvedQuestionIdList sendDto = new UserSolvedQuestionIdList(userId, correctQuestionIdList);
-        UserSolvedCategoryDtoList userSolvedCategoryDtoList = getSolvedQuestionDataFromQuestionServer(questionUrl+"/api/external/getUserSolvedCategory", sendDto);
-        return userSolvedCategoryDtoList;
-    }
-
-    private UserSolvedCategoryDtoList getSolvedQuestionDataFromQuestionServer(String url, UserSolvedQuestionIdList userSolvedQuestionIdList) {
-        ResponseEntity<UserSolvedCategoryDtoList> response = restTemplate.postForEntity(url, userSolvedQuestionIdList, UserSolvedCategoryDtoList.class);
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to get valid response from " + url);
-        }
-    }
-
-    private QuestionDifficultyCounts getQuestionDifficultyCounts(String url) {
-        ResponseEntity<QuestionDifficultyCounts> response = restTemplate.postForEntity(url, "", QuestionDifficultyCounts.class);
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to get valid response from " + url);
-        }
-    }
-
-    private UserSolvedRatioTotalDto getSolvedQuestionDataFromQuestionServer(String url, UserSolvedRatioTotalDto request) {
-        ResponseEntity<UserSolvedRatioTotalDto> response = restTemplate.postForEntity(url, request, UserSolvedRatioTotalDto.class);
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to get valid response from " + url);
-        }
+        return correctQuestionIdList;
     }
 }
