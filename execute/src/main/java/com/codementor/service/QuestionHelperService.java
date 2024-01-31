@@ -6,17 +6,25 @@ import com.codementor.repository.ExecuteUsercodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class QuestionHelperService {
     private final ExecuteUsercodeRepository executeUsercodeRepository;
 
+    /**
+     * 유저 아이디로 유저가 푼 문제와 시도한 문제를 가져온다.
+     * @param userId
+     * @return 유저가 시도한 문제 Id 리스트와 유저가 푼 문제 Id 리스트
+     */
     public UserQuestionsStatus getUserQuestionsStatus(Long userId) {
         List<ExecuteUsercode> executeUsercodes = executeUsercodeRepository.findAllByUserId(userId);
-        List<Long> attemptedQuestionIds = null;
-        List<Long> solvedQuestionIds = null;
+        Set<Long> attemptedQuestionIds = new HashSet<>();
+        Set<Long> solvedQuestionIds = new HashSet<>();
 
         for (ExecuteUsercode executeUsercode : executeUsercodes) {
             if (executeUsercode.getIsCorrect()) {
@@ -25,6 +33,9 @@ public class QuestionHelperService {
                 attemptedQuestionIds.add(executeUsercode.getQuestionId());
             }
         }
-        return new UserQuestionsStatus(attemptedQuestionIds, solvedQuestionIds);
+        return UserQuestionsStatus.builder()
+                .attmptedQuestions(new ArrayList<>(attemptedQuestionIds))
+                .solvedQuestions(new ArrayList<>(solvedQuestionIds))
+                .build();
     }
 }
