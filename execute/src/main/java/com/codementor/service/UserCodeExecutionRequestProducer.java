@@ -1,7 +1,5 @@
 package com.codementor.service;
 
-import com.codementor.core.exception.CodeMentorException;
-import com.codementor.core.exception.ErrorEnum;
 import com.codementor.core.util.RequestToServer;
 import com.codementor.core.util.SendToKafka;
 import com.codementor.dto.evaluation.EvalQuestionRequest;
@@ -9,16 +7,10 @@ import com.codementor.dto.evaluation.EvaluationDto;
 import com.codementor.dto.request.UserCodeExecutionRequest;
 import com.codementor.entity.ExecuteUsercode;
 import com.codementor.repository.ExecuteUsercodeRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor

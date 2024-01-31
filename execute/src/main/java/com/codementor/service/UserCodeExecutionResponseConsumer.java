@@ -8,13 +8,9 @@ import com.codementor.entity.ExecuteResult;
 import com.codementor.entity.ExecuteUsercode;
 import com.codementor.repository.ExecuteResultRepository;
 import com.codementor.repository.ExecuteUsercodeRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityNotFoundException;
 
 @Component
 @RequiredArgsConstructor

@@ -1,7 +1,5 @@
 package com.codementor.service;
 
-import com.codementor.core.exception.CodeMentorException;
-import com.codementor.core.exception.ErrorEnum;
 import com.codementor.core.util.RequestToServer;
 import com.codementor.dto.UserSolvedCategoryDtoList;
 import com.codementor.dto.UserSolvedRatioSubmitDto;
@@ -13,7 +11,6 @@ import com.codementor.repository.ExecuteUsercodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
