@@ -9,9 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SseConnectionService {
     private final ConcurrentHashMap<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    public SseEmitter createEmitterForUsers(String userId){
+    public SseEmitter createEmitterForUsers(Long userId){
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-        emitters.put(userId, emitter);
+        emitters.put(userId.toString(), emitter);
         emitter.onCompletion(() -> emitters.remove(userId));
         emitter.onTimeout(() -> emitters.remove(userId));
         emitter.onError((e) -> emitters.remove(userId));
