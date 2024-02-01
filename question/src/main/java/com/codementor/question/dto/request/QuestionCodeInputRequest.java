@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class QuestionCodeInputRequest {
 
-    private Integer questionId;
+    private Long questionId;
     private String languageType;
     private String questionInitContent;
     private String answerCheckContent;
