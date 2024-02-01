@@ -1,11 +1,10 @@
 package com.codementor.controller;
 
-import com.codementor.dto.UserSolvedCategoryDtoList;
-import com.codementor.dto.UserSolvedRatioSubmitDto;
-import com.codementor.dto.UserSolvedRatioTotalDto;
+import com.codementor.core.dto.ResponseDto;
 import com.codementor.service.ExecuteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,8 +19,8 @@ public class ExecuteController {
      * @return UserSolvedRatioSubmitDto
      */
     @GetMapping("/api/execute/problem/solved/ratio/submit")
-    public UserSolvedRatioSubmitDto getUserProblemSolvedSubmitRatio(Long userId){
-        return executeService.getUserSolvedRatioSubmit(userId);
+    public ResponseDto getUserProblemSolvedSubmitRatio(@RequestHeader("userId") Long userId){
+        return ResponseDto.ok(executeService.getUserSolvedRatioSubmit(userId));
     }
 
     /**
@@ -30,13 +29,18 @@ public class ExecuteController {
      * @return UserSolvedRatioSTotalDto
      */
     @GetMapping("/api/execute/problem/solved/ratio/total")
-    public UserSolvedRatioTotalDto getUserProblemSolvedTotalRatio(Long userId){
-        return executeService.getUserSolvedRatioTotal(userId);
+    public ResponseDto getUserProblemSolvedTotalRatio(@RequestHeader("userId") Long userId){
+        return ResponseDto.ok(executeService.getUserSolvedRatioTotal(userId));
     }
 
+    /**
+     * 회원이 해결한 문제 카테고리
+     * @param userId
+     * @return UserSolvedCategoryDtoList
+     */
     @GetMapping("/api/execute/problem/solved/category")
-    public UserSolvedCategoryDtoList getUserSolvedQuestionCategory(Long userId){
-        return executeService.getUserSolvedQuestion(userId);
+    public ResponseDto getUserSolvedQuestionCategory(@RequestHeader("userId") Long userId){
+        return ResponseDto.ok(executeService.getUserSolvedQuestion(userId));
     }
 
 }

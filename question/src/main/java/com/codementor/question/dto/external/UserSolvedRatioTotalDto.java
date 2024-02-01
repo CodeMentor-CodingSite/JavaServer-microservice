@@ -33,4 +33,11 @@ public class UserSolvedRatioTotalDto {
         this.hardProblemTotalCount = 0L;
         this.questionIdList = questionIdList;
     }
+
+    public UserSolvedRatioTotalDto addProblemSolvedCounts(Long easyProblemSolvedCount, Long mediumProblemSolvedCount, Long hardProblemSolvedCount) {
+        this.easyProblemSolvedCount = easyProblemSolvedCount;
+        this.mediumProblemSolvedCount = mediumProblemSolvedCount;
+        this.hardProblemSolvedCount = hardProblemSolvedCount;
+        return this;
+    }
 }

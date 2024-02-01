@@ -1,5 +1,6 @@
 package com.codementor.dto;
 
+import com.codementor.dto.external.QuestionDifficultyCounts;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,5 +33,11 @@ public class UserSolvedRatioTotalDto {
         this.hardProblemSolvedCount = 0L;
         this.hardProblemTotalCount = 0L;
         this.questionIdList = questionIdList;
+    }
+
+    public void updateProblemCountWith(QuestionDifficultyCounts questionDifficultyCounts){
+        this.easyProblemSolvedCount = questionDifficultyCounts.getEasyProblemsCount();
+        this.mediumProblemSolvedCount = questionDifficultyCounts.getMediumProblemsCount();
+        this.hardProblemSolvedCount = questionDifficultyCounts.getHardProblemsCount();
     }
 }

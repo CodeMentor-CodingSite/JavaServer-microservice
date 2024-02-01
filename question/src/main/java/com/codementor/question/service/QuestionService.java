@@ -1,5 +1,8 @@
 package com.codementor.question.service;
 
+import com.codementor.question.core.exception.CodeMentorException;
+import com.codementor.question.core.exception.ErrorEnum;
+import com.codementor.question.core.util.RequestToServer;
 import com.codementor.question.dto.external.UserQuestionsStatus;
 import com.codementor.question.dto.PlanDto;
 import com.codementor.question.dto.response.PlanResponse;
@@ -33,6 +36,8 @@ public class QuestionService {
     @Value("$server.execute.url")
     private String executeUrl;
 
+    private final RequestToServer requestToServer;
+
     private final QuestionRepository questionRepository;
     private final PlanRepository planRepository;
     private final PlanMapRepository planMapRepository;
@@ -46,7 +51,8 @@ public class QuestionService {
      * @return 페이지네이션된 문제 dto
      */
     public Page<QuestionDto> getPaginatedQuestionDtos(Long userId, Pageable pageable){
-        UserQuestionsStatus userQuestionsStatus = getuserQuestionsStatus(executeUrl + "/api/external/question/get/user/status", userId);
+        String getUserQuestionsStatusUrl = executeUrl + "/api/external/question/get/user/status";
+        UserQuestionsStatus userQuestionsStatus = requestToServer.postDataToServer(getUserQuestionsStatusUrl, userId, UserQuestionsStatus.class);
         HashSet<Long> userSolvedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getAttmptedQuestions());
         HashSet<Long> userAttemptedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getSolvedQuestions());
 
@@ -94,11 +100,11 @@ public class QuestionService {
      */
     public QuestionInitCodeResponse getQuestionInitialCode(Long questionId, String language) {
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
+                .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         QuestionLanguage questionLanguage = question.getQuestionLanguages().stream()
                 .filter(ql -> ql.getLanguage()!= null && language.equals(ql.getLanguage().getType()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Question language not found"));
+                .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         return new QuestionInitCodeResponse(questionLanguage.getInitContent());
     }
 

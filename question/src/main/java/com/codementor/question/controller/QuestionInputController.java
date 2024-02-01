@@ -1,5 +1,6 @@
 package com.codementor.question.controller;
 
+import com.codementor.question.core.dto.ResponseDto;
 import com.codementor.question.dto.request.ConverterInputRequest;
 import com.codementor.question.dto.request.QuestionCodeInputRequest;
 import com.codementor.question.dto.request.QuestionInputRequest;
@@ -21,26 +22,26 @@ public class QuestionInputController {
     private final QuestionInputService questionInputService;
 
     @PostMapping("/question")
-    public ResponseEntity<String> questionInput(@RequestBody QuestionInputRequest request) {
-        Integer questionId = questionInputService.questionInput(request);
-        return ResponseEntity.ok(questionId.toString());
+    public ResponseDto<String> questionInput(@RequestBody QuestionInputRequest request) {
+        Long questionId = questionInputService.questionInput(request);
+        return ResponseDto.ok(questionId.toString());
     }
 
     @PostMapping("/testcase")
-    public ResponseEntity<String> testCaseInput(@RequestBody TestCaseRequest request) {
-        Integer testCaseId = questionInputService.testCaseInput(request);
-        return ResponseEntity.ok(testCaseId.toString());
+    public ResponseDto<String> testCaseInput(@RequestBody TestCaseRequest request) {
+        Long testCaseId = questionInputService.testCaseInput(request);
+        return ResponseDto.ok(testCaseId.toString());
     }
 
     @PostMapping("/converter")
-    public ResponseEntity<String> converterInput(@RequestBody ConverterInputRequest request) {
-        Integer converterId = questionInputService.converterInput(request);
-        return ResponseEntity.ok(converterId.toString());
+    public ResponseDto<String> converterInput(@RequestBody ConverterInputRequest request) {
+        Long converterId = questionInputService.converterInput(request);
+        return ResponseDto.ok(converterId.toString());
     }
 
     @PostMapping("/question-code")
-    public ResponseEntity<String> questionCodeInput(@RequestBody QuestionCodeInputRequest request) {
-        Integer questionCodeId = questionInputService.questionCodeInput(request);
-        return ResponseEntity.ok(questionCodeId.toString());
+    public ResponseDto<String> questionCodeInput(@RequestBody QuestionCodeInputRequest request) {
+        Long questionCodeId = questionInputService.questionCodeInput(request);
+        return ResponseDto.ok(questionCodeId.toString());
     }
 }

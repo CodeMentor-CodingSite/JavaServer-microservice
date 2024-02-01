@@ -1,5 +1,7 @@
 package com.codementor.entity;
 
+import com.codementor.dto.evaluation.EvalTestCaseDto;
+import com.codementor.dto.evaluation.EvaluationDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -45,4 +47,20 @@ public class ExecuteUsercode {
     @OneToMany(mappedBy = "executeUsercode")
     private List<ExecuteResult> executeResults;
 
+    public void updateWithIsCorrectAndExecuteTimeWith(EvaluationDto evaluationDto) {
+        this.executeTime = evaluationDto.getExecuteTime();
+        // 문제 정답 여부 판단
+        boolean isCorrect = true;
+        for (EvalTestCaseDto evalTestCaseDto : evaluationDto.getTestCaseDtoList()) {
+            if (evalTestCaseDto.getTestCaseResult().equals("False")) {
+                isCorrect = false;
+                break;
+            }
+        }
+        this.isCorrect = isCorrect;
+    }
+
+    public void updateWithGptEvaluationWith(EvaluationDto evaluationDto) {
+        this.gptEvaluation = evaluationDto.getGptEvaluation();
+    }
 }
