@@ -44,10 +44,12 @@ public class UserController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<TokenDTO> reissueToken(@RequestHeader("refresh_token") String token) {
-        TokenDTO tokenDTO = userService.reissueToken(token);
+    public ResponseEntity<TokenDTO> reissueToken(@RequestHeader("id") Long id) {
+        TokenDTO tokenDTO = userService.reissueToken(id);
 
-        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header(SET_COOKIE_HEADER, tokenDTO.createAccessTokenCookie())
+                .build();
     }
 
     @DeleteMapping("/users")
