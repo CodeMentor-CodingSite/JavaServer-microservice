@@ -1,5 +1,6 @@
 package com.codementor.question.controller;
 
+import com.codementor.question.core.dto.ResponseDto;
 import com.codementor.question.dto.response.PlanResponse;
 import com.codementor.question.dto.response.QuestionDetailDtoResponse;
 import com.codementor.question.dto.QuestionDto;
@@ -26,17 +27,17 @@ public class QuestionController {
     }
 
     @GetMapping("/question/{questionId}")
-    public QuestionDetailDtoResponse getQuestionDetail(@PathVariable Long questionId) {
-        return questionService.getQuestionById(questionId);
+    public ResponseDto<QuestionDetailDtoResponse> getQuestionDetail(@PathVariable Long questionId) {
+        return ResponseDto.ok( questionService.getQuestionById(questionId));
     }
 
     @GetMapping("question/{questionId}/initial-code/{langauage}")
-    public QuestionInitCodeResponse getQuestionInitialCode(@PathVariable Long questionId, @PathVariable String language) {
-        return questionService.getQuestionInitialCode(questionId, language);
+    public ResponseDto<QuestionInitCodeResponse> getQuestionInitialCode(@PathVariable Long questionId, @PathVariable String language) {
+        return ResponseDto.ok(questionService.getQuestionInitialCode(questionId, language));
     }
 
     @GetMapping("/plan")
-    public PlanResponse getPlanList() {
-        return questionService.getAllPlans();
+    public ResponseDto<PlanResponse> getPlanList() {
+        return ResponseDto.ok(questionService.getAllPlans());
     }
 }
