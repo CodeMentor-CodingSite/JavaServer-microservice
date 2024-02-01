@@ -34,9 +34,10 @@ public class User {
     @Column(name = "lastname", columnDefinition = "VARCHAR(50)")
     private String lastname;
 
-    @Column(name = "role", columnDefinition = "VARCHAR(10)")
+    @Builder.Default
+    @Column(name = "role", columnDefinition = "VARCHAR(10) DEFAULT 'USER'")
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private UserRole role = UserRole.USER;
 
     @Builder.Default
     @Column(name = "status", columnDefinition = "VARCHAR(50) DEFAULT 'OPEN'")

@@ -34,7 +34,7 @@ public class JwtUtil {
         Claims claims = parseTokenToClaims(token);
         String id = claims.get("id").toString();
         String value = redisService.getValue(id);
-        if (redisService.checkExistsValue(value)) throw new TokenException(TokenErrorEnum.LOGOUT_TOKEN);
+        if (redisService.checkExistsValue(value)) throw new TokenException(TokenErrorEnum.WRONG_TOKEN);
 
         if (role.equals("admin")) checkAdminRole(claims);
 
@@ -60,10 +60,10 @@ public class JwtUtil {
     public String getToken(ServerHttpRequest request, String type) {
         String token = null;
 
-        if (type.equals("access") && request.getHeaders().containsKey("Authorization")) {
-            token = request.getHeaders().get("Authorization").get(0);
-        } else if (type.equals("refresh") && request.getHeaders().containsKey("refresh_token")) {
-            token = request.getHeaders().get("refresh_token").get(0);
+        if (type.equals("access") && request.getCookies().containsKey("Authorization")) {
+            token = request.getCookies().get("Authorization").get(0).getValue();
+        } else if (type.equals("refresh") && request.getCookies().containsKey("refresh_token")) {
+            token = request.getCookies().get("refresh_token").get(0).getValue();
         }
 
         return token;

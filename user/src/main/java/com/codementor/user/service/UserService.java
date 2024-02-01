@@ -62,8 +62,7 @@ public class UserService {
     }
 
     @Transactional
-    public TokenDTO reissueToken(String token) {
-        Long id = jwtProvider.validateRefreshToken(token);
+    public TokenDTO reissueToken(Long id) {
         User foundUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
