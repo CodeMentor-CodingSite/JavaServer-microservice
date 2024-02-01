@@ -14,4 +14,5 @@ public class QuestionDifficultyCounts {
     private Long easyProblemsCount;
     private Long mediumProblemsCount;
     private Long hardProblemsCount;
+
 }
