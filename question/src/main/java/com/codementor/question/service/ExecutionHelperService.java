@@ -133,14 +133,13 @@ public class ExecutionHelperService {
     }
 
     public UserSolvedRatioTotalDto getUserSolvedRatioSubmitDto(UserSolvedRatioTotalDto req){
-        // make a hashset for unique user problem list
-        HashSet<Long> questionSolvedList = new HashSet<>();
-        for (Long questionId : req.getQuestionIdList()) {
-            questionSolvedList.add(questionId);
-        }
         Long easyProblemSolvedCount = 0L;
         Long mediumProblemSolvedCount = 0L;
         Long hardProblemSolvedCount = 0L;
+
+        // make a hashset for unique user problem list
+        HashSet<Long> questionSolvedList = new HashSet<>();
+        questionSolvedList.addAll(req.getQuestionIdList());
         List<Question> questionsList = questionRepository.findAll();
         for (Question question : questionsList) {
             if (questionSolvedList.contains(question.getId())) {
@@ -154,10 +153,7 @@ public class ExecutionHelperService {
                 }
             }
         }
-        req.setEasyProblemSolvedCount(easyProblemSolvedCount);
-        req.setMediumProblemSolvedCount(mediumProblemSolvedCount);
-        req.setHardProblemSolvedCount(hardProblemSolvedCount);
-        return req;
+        return req.addProblemSolvedCounts(easyProblemSolvedCount, mediumProblemSolvedCount, hardProblemSolvedCount);
     }
 
     public UserSolvedCategoryDtoList getUserSolvedCategoryQuestionList(UserSolvedQuestionIdList req){
@@ -166,6 +162,8 @@ public class ExecutionHelperService {
         List<UserSolvedCategoryDto> result = questionsList.stream()
                 .map(question -> new UserSolvedCategoryDto().from(question))
                 .collect(Collectors.toList());
-        return new UserSolvedCategoryDtoList(result);
+        return UserSolvedCategoryDtoList.builder()
+                .userSolvedCategoryDtoList(result)
+                .build();
     }
 }
