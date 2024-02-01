@@ -8,9 +8,11 @@ import com.codementor.question.dto.request.QuestionCodeInputRequest;
 import com.codementor.question.dto.request.QuestionInputRequest;
 import com.codementor.question.dto.request.TestCaseRequest;
 import com.codementor.question.entity.*;
+import com.codementor.question.enums.QuestionDifficulty;
 import com.codementor.question.repository.*;
 import jdk.jshell.spi.ExecutionControl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -40,6 +42,7 @@ public class QuestionInputService {
                 .title(request.getQuestionTitle())
                 .content(request.getQuestionContent())
                 .category(request.getQuestionCategory())
+                .difficulty(request.getQuestionDifficulty())
                 .build();
         Question savedQuestion = questionRepository.save(question);
 
@@ -128,6 +131,7 @@ public class QuestionInputService {
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         Optional<QuestionLanguage> foundQuestionLanguage = questionLanguageRepository.findByQuestionAndLanguage(question, language);
         if (foundQuestionLanguage.isPresent()) {
+            System.out.println("foundQuestionLanguage.get().getId() = " + foundQuestionLanguage.get().getId());
             throw new CodeMentorException(ErrorEnum.RECORD_ALREADY_EXISTS);
         }
 
