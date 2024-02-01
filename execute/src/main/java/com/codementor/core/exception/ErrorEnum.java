@@ -17,6 +17,7 @@ public enum ErrorEnum {
     // DB 관련 : 5000
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5000, "Database error"),
     RECORD_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, 5001, "Record not found"),
+    RECORD_ALREADY_EXISTS(HttpStatus.INTERNAL_SERVER_ERROR, 5002, "Duplicate record"),
 
     // 서버 통신 관련 : 5030
     API_SERVER_COMMUNICATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5030, "API Server communication error"),

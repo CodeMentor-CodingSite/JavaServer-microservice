@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -125,6 +126,10 @@ public class QuestionInputService {
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         Language language = languageRepository.findByType(questionCodeInputRequest.getLanguageType())
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
+        Optional<QuestionLanguage> foundQuestionLanguage = questionLanguageRepository.findByQuestionAndLanguage(question, language);
+        if (foundQuestionLanguage.isPresent()) {
+            throw new CodeMentorException(ErrorEnum.RECORD_ALREADY_EXISTS);
+        }
 
         QuestionLanguage questionLanguage = QuestionLanguage.builder()
                 .question(question)
