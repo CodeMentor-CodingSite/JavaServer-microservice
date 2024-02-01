@@ -1,0 +1,27 @@
+apigateway:
+- changed-files:
+  - any-glob-to-any-file: ['apigateway/**/*']
+
+evaluatie:
+- changed-files:
+  - any-glob-to-any-file: ['evaluatie/**/*']
+
+execute:
+- changed-files:
+  - any-glob-to-any-file: ['execute/**/*']
+
+question:
+- changed-files:
+  - any-glob-to-any-file: ['question/**/*']
+
+user:
+- changed-files:
+  - any-glob-to-any-file: ['user/**/*']
+
+dependencies:
+- changed-files:
+  - any-glob-to-any-file: ['build.gradle', 'apigateway/build.gradle', 'evaluate/build.gradle', 'execute/build.gradle', 'question/build.gradle', 'user/build.gradle']
+
+cicd:
+- changed-files:
+  - any-glob-to-any-file: ['.github/**/*', 'Docker*']
