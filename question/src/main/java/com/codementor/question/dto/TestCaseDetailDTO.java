@@ -13,5 +13,5 @@ public class TestCaseDetailDTO {
 
     private String testCaseKey;
     private String testCaseValue;
-    private ArrayList<Integer> converterIds;
+    private ArrayList<Long> converterIds;
 }
