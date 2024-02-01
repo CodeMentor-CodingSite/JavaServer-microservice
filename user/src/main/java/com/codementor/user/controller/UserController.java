@@ -10,36 +10,37 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-
 @RestController()
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
+
+    private static final String SET_COOKIE_HEADER = "Set-Cookie";
+
     private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<String> createUser(@RequestBody UserCreateDTO userCreateDTO) {
         String message = userService.createUser(userCreateDTO);
 
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> doLogin(@RequestBody UserLoginDTO userLoginDTO, HttpServletResponse response) {
+    public ResponseEntity<Void> doLogin(@RequestBody UserLoginDTO userLoginDTO) {
         TokenDTO tokenDTO = userService.doLogin(userLoginDTO);
 
-        response.addHeader("access_token", tokenDTO.getAccessToken());
-        response.addHeader("refresh_token", tokenDTO.getRefreshToken());
-
-        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header(SET_COOKIE_HEADER, tokenDTO.createAccessTokenCookie())
+                .header(SET_COOKIE_HEADER, tokenDTO.createRefreshTokenCookie())
+                .build();
     }
 
     @GetMapping("/users")
     public ResponseEntity<UserProfileDTO> getUser(@RequestHeader("id") Long id) {
         UserProfileDTO userProfileDTO = userService.getUser(id);
 
-        return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
+        return ResponseEntity.ok(userProfileDTO);
     }
 
     @PostMapping("/reissue")
@@ -60,6 +61,6 @@ public class UserController {
     public ResponseEntity<String> doLogout(@RequestHeader("Authorization") String token) {
         String message = userService.doLogout(token);
 
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        return ResponseEntity.ok(message);
     }
 }

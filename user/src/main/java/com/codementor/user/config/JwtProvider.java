@@ -1,8 +1,6 @@
 package com.codementor.user.config;
 
 import com.codementor.user.entity.UserRole;
-import com.codementor.user.exception.UserErrorEnum;
-import com.codementor.user.exception.UserException;
 import com.codementor.user.service.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -81,16 +79,6 @@ public class JwtProvider {
                 .setSigningKey(key).build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    public Long validateRefreshToken(String token) {
-        Claims claims = parseTokenToClaims(token);
-        String id = claims.get("id").toString();
-        String value = redisService.getValue(id);
-
-        if (redisService.checkExistsValue(value)) throw new UserException(UserErrorEnum.NOT_FOUND_REFRESH_TOKEN);
-
-        return Long.valueOf(id);
     }
 
     public Long validateAccessToken(String token) {
