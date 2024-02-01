@@ -52,9 +52,11 @@ public class UserCodeExecutionRequestProducer {
                 EvaluationDto.class);
 
         ExecuteUsercode executeUsercode = ExecuteUsercode.builder() // 2.
+                .userId(userCodeExecutionRequest.getUserId())
                 .questionId(evaluationDto.getQuestionId())
-                .userLanguage(evaluationDto.getUserLanguage())
-                .userCode(evaluationDto.getUserCode())
+                .userLanguage(userCodeExecutionRequest.getUserLanguage())
+                .userCode(userCodeExecutionRequest.getUserCode())
+                .isCorrect(false)
                 .build();
         Long executeUsercodeId = executeUsercodeRepository.save(executeUsercode).getId();
 
