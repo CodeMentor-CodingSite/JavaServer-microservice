@@ -22,26 +22,26 @@ public class QuestionInputController {
     private final QuestionInputService questionInputService;
 
     @PostMapping("/question")
-    public ResponseDto<String> questionInput(@RequestBody QuestionInputRequest request) {
+    public ResponseDto questionInput(@RequestBody QuestionInputRequest request) {
         Long questionId = questionInputService.questionInput(request);
-        return ResponseDto.ok(questionId.toString());
+        return ResponseDto.ok(questionId);
     }
 
     @PostMapping("/testcase")
-    public ResponseDto<String> testCaseInput(@RequestBody TestCaseRequest request) {
+    public ResponseDto testCaseInput(@RequestBody TestCaseRequest request) {
         Long testCaseId = questionInputService.testCaseInput(request);
-        return ResponseDto.ok(testCaseId.toString());
+        return ResponseDto.ok(testCaseId);
     }
 
     @PostMapping("/converter")
-    public ResponseDto<String> converterInput(@RequestBody ConverterInputRequest request) {
+    public ResponseDto converterInput(@RequestBody ConverterInputRequest request) {
         Long converterId = questionInputService.converterInput(request);
-        return ResponseDto.ok(converterId.toString());
+        return ResponseDto.ok(converterId);
     }
 
     @PostMapping("/question-code")
-    public ResponseDto<String> questionCodeInput(@RequestBody QuestionCodeInputRequest request) {
+    public ResponseDto questionCodeInput(@RequestBody QuestionCodeInputRequest request) {
         Long questionCodeId = questionInputService.questionCodeInput(request);
-        return ResponseDto.ok(questionCodeId.toString());
+        return ResponseDto.ok(questionCodeId);
     }
 }
