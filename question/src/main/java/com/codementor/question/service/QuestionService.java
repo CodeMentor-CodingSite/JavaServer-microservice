@@ -17,12 +17,14 @@ import com.codementor.question.repository.PlanMapRepository;
 import com.codementor.question.repository.PlanRepository;
 import com.codementor.question.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class QuestionService {
 
-    @Value("$server.execute.url")
+    @Value("${server.execute.url}")
     private String executeUrl;
 
     private final RequestToServer requestToServer;
@@ -42,6 +44,7 @@ public class QuestionService {
     private final PlanRepository planRepository;
     private final PlanMapRepository planMapRepository;
 
+    @Autowired
     private RestTemplate restTemplate;
 
     /**
@@ -50,11 +53,12 @@ public class QuestionService {
      * @param pageable 페이지네이션 정보
      * @return 페이지네이션된 문제 dto
      */
-    public Page<QuestionDto> getPaginatedQuestionDtos(Long userId, Pageable pageable){
+    public Page<QuestionDto> getPaginatedQuestionDtos(@RequestHeader("userId") Long userId, Pageable pageable){
         String getUserQuestionsStatusUrl = executeUrl + "/api/external/question/get/user/status";
         UserQuestionsStatus userQuestionsStatus = requestToServer.postDataToServer(getUserQuestionsStatusUrl, userId, UserQuestionsStatus.class);
-        HashSet<Long> userSolvedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getAttmptedQuestions());
-        HashSet<Long> userAttemptedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getSolvedQuestions());
+        System.out.println("userQuestionsStatus: " + userQuestionsStatus.toString());
+        HashSet<Long> userAttemptedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getAttmptedQuestions());
+        HashSet<Long> userSolvedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getSolvedQuestions());
 
         Page<Question> questionPage = questionRepository.findAll(pageable);
         List<QuestionDto> questionDtos = new ArrayList<>();

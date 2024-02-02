@@ -4,6 +4,7 @@ import com.codementor.dto.external.UserQuestionsStatus;
 import com.codementor.service.QuestionHelperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -12,8 +13,8 @@ public class ExternalExecuteController {
 
     private final QuestionHelperService questionHelperService;
 
-    @PostMapping("/api/execute/api/external/question/get/user/status")
-    public UserQuestionsStatus getUserQuestionsStatus(Long userId) {
+    @PostMapping("/api/external/question/get/user/status")
+    public UserQuestionsStatus getUserQuestionsStatus(@RequestBody Long userId) {
         return questionHelperService.getUserQuestionsStatus(userId);
     }
 }

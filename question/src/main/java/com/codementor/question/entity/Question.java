@@ -28,7 +28,7 @@ public class Question {
     private String category;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = " questino_difficulty", columnDefinition = "VARCHAR(40)")
+    @Column(name = " question_difficulty", columnDefinition = "VARCHAR(40)")
     private QuestionDifficulty difficulty;
 
     @Column(name = "question_likes", columnDefinition = "BIGINT(20)")

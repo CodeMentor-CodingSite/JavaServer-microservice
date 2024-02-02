@@ -52,14 +52,17 @@ public class UserCodeExecutionRequestProducer {
                 EvaluationDto.class);
 
         ExecuteUsercode executeUsercode = ExecuteUsercode.builder() // 2.
+                .userId(userCodeExecutionRequest.getUserId())
                 .questionId(evaluationDto.getQuestionId())
-                .userLanguage(evaluationDto.getUserLanguage())
-                .userCode(evaluationDto.getUserCode())
+                .userLanguage(userCodeExecutionRequest.getUserLanguage())
+                .userCode(userCodeExecutionRequest.getUserCode())
+                .isCorrect(false)
                 .build();
         Long executeUsercodeId = executeUsercodeRepository.save(executeUsercode).getId();
 
         evaluationDto.updateWith(userCodeExecutionRequest, executeUsercodeId); // 3.
 
+        System.out.println("Sending to Kafka");
         sendToKafka.sendData(TOPIC_NAME, evaluationDto); // 4.
     }
 }
