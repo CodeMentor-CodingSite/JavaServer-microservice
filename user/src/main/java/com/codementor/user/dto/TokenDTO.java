@@ -24,7 +24,7 @@ public class TokenDTO {
     }
 
     public String createRefreshTokenCookie() {
-        return ResponseCookie.from("refresh-token", this.refreshToken)
+        return ResponseCookie.from("refresh_token", this.refreshToken)
                 .path("/")
                 .sameSite("None")
                 .httpOnly(true)
