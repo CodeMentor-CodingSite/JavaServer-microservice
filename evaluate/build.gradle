@@ -23,6 +23,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.kafka:spring-kafka'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// ssh
+	implementation 'com.jcraft:jsch:0.1.55'
 }
 
 tasks.named('bootBuildImage') {

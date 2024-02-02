@@ -62,6 +62,7 @@ public class UserCodeExecutionRequestProducer {
 
         evaluationDto.updateWith(userCodeExecutionRequest, executeUsercodeId); // 3.
 
+        System.out.println("Sending to Kafka");
         sendToKafka.sendData(TOPIC_NAME, evaluationDto); // 4.
     }
 }
