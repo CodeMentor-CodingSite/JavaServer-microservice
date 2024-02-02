@@ -37,7 +37,9 @@ public class UserCodeExecuteRequestConsumer {
      */
     @KafkaListener(topics = TOPIC_NAME, groupId = GROUP_ID)
     public void recordListener(String jsonMessage) {
+        System.out.println("running recordListener");
         try{
+            System.out.println("kafka message = " + jsonMessage);
             EvaluationDto evaluationDto = objectMapper.readValue(jsonMessage, EvaluationDto.class);
             log.info("recordListener message = {}",jsonMessage);
 

@@ -14,7 +14,7 @@ public class ExecuteController {
     private final ExecuteService executeService;
 
     /**
-     * 회원이 해결한 문제 비율 (해결 / 총 제출)
+     * 회원이 해결한 문제 (해결 / 총 제출)
      * @param userId 회원 아이디
      * @return UserSolvedRatioSubmitDto
      */
@@ -24,7 +24,7 @@ public class ExecuteController {
     }
 
     /**
-     * 회원이 해결한 문제 비율 (해결 / 총 문제)
+     * 회원이 해결한 문제 (해결 / 총 문제)
      * @param userId 회원 아이디
      * @return UserSolvedRatioSTotalDto
      */

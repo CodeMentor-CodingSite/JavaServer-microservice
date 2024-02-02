@@ -22,6 +22,7 @@ public class QuestionHelperService {
      * @return 유저가 시도한 문제 Id 리스트와 유저가 푼 문제 Id 리스트
      */
     public UserQuestionsStatus getUserQuestionsStatus(Long userId) {
+        System.out.println("userId: " + userId);
         List<ExecuteUsercode> executeUsercodes = executeUsercodeRepository.findAllByUserId(userId);
         Set<Long> attemptedQuestionIds = new HashSet<>();
         Set<Long> solvedQuestionIds = new HashSet<>();

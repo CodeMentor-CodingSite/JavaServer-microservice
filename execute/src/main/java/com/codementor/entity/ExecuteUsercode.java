@@ -39,7 +39,7 @@ public class ExecuteUsercode {
     private String timeStamp;
 
     @Column(name = "is_correct")
-    private Boolean isCorrect;
+    private Boolean isCorrect = false;
 
     @Column(name = "gpt_evaluation", columnDefinition = "TEXT")
     private String gptEvaluation;

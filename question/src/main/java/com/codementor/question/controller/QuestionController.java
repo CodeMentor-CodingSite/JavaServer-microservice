@@ -18,7 +18,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    @GetMapping("/question")
+    @GetMapping("/questions")
     public Page<QuestionDto> getQuestionList(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
@@ -27,7 +27,8 @@ public class QuestionController {
     }
 
     @GetMapping("/question/{questionId}")
-    public ResponseDto<QuestionDetailDtoResponse> getQuestionDetail(@PathVariable Long questionId) {
+    public ResponseDto<QuestionDetailDtoResponse> getQuestionDetail(@PathVariable Long questionId,
+                                                                    @RequestParam(value = "userId") Long userId) {
         return ResponseDto.ok( questionService.getQuestionById(questionId));
     }
 

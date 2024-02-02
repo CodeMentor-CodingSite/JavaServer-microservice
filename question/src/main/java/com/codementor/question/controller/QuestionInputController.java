@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/question/input/")
@@ -23,6 +22,7 @@ public class QuestionInputController {
 
     @PostMapping("/question")
     public ResponseDto questionInput(@RequestBody QuestionInputRequest request) {
+        System.out.println(request.getQuestionDifficulty());
         Long questionId = questionInputService.questionInput(request);
         return ResponseDto.ok(questionId);
     }
