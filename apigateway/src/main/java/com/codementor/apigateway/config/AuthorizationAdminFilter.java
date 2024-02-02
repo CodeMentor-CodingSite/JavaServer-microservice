@@ -18,8 +18,16 @@ public class AuthorizationAdminFilter extends AbstractGatewayFilterFactory<Objec
     public GatewayFilter apply(Object config) {
         return (exchange, chain) -> {
             String accessToken = jwtUtil.getToken(exchange.getRequest(), "access");
+            String refreshToken = jwtUtil.getToken(exchange.getRequest(), "refresh");
+            String path = exchange.getRequest().getPath().toString();
 
-            if (accessToken == null) throw new TokenException(TokenErrorEnum.UNAUTHORIZED);
+            if (accessToken == null) {
+                if (refreshToken != null && path.equals("/api/user/reissue")) {
+                    jwtUtil.validateToken(refreshToken, exchange, "admin");
+                    return chain.filter(exchange);
+                }
+                throw new TokenException(TokenErrorEnum.UNAUTHORIZED);
+            }
 
             jwtUtil.validateToken(accessToken, exchange, "admin");
 
