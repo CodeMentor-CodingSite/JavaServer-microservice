@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> doLogout(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> doLogout(@CookieValue("access_token") String token) {
         String message = userService.doLogout(token);
 
         return ResponseEntity.ok(message);
