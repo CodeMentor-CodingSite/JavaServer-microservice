@@ -1,10 +1,7 @@
 package com.codementor.user.service;
 
 import com.codementor.user.config.JwtProvider;
-import com.codementor.user.dto.TokenDTO;
-import com.codementor.user.dto.UserCreateDTO;
-import com.codementor.user.dto.UserLoginDTO;
-import com.codementor.user.dto.UserProfileDTO;
+import com.codementor.user.dto.*;
 import com.codementor.user.entity.User;
 import com.codementor.user.exception.UserErrorEnum;
 import com.codementor.user.exception.UserException;
@@ -78,6 +75,26 @@ public class UserService {
         jwtProvider.setBlackListAccessToken(id, token);
 
         return "Success";
+    }
+
+    @Transactional
+    public String updateUser(UserUpdateDTO userUpdateDTO, Long id) {
+        User foundUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+
+        String nickname = userUpdateDTO.getNickname();
+        if (nickname != null) foundUser.updateNickname(nickname);
+
+        String password = userUpdateDTO.getPassword();
+        if (password != null) changePassword(password, foundUser);
+
+
+        return "Success";
+    }
+
+    private void changePassword(String password, User foundUser) {
+        foundUser.updatePassword(password);
+        foundUser.encodePassword(passwordEncoder);
     }
 
     private void checkExistedUser(UserCreateDTO userCreateDTO) {
