@@ -53,4 +53,12 @@ public class User {
     public boolean isMatchPassword(String raw, PasswordEncoder passwordEncoder) {
         return passwordEncoder.matches(raw, this.password);
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

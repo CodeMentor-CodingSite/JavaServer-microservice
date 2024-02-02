@@ -1,9 +1,6 @@
 package com.codementor.user.controller;
 
-import com.codementor.user.dto.TokenDTO;
-import com.codementor.user.dto.UserCreateDTO;
-import com.codementor.user.dto.UserLoginDTO;
-import com.codementor.user.dto.UserProfileDTO;
+import com.codementor.user.dto.*;
 import com.codementor.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -62,6 +59,13 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<String> doLogout(@CookieValue("access_token") String token) {
         String message = userService.doLogout(token);
+
+        return ResponseEntity.ok(message);
+    }
+
+    @PutMapping("/users")
+    public ResponseEntity<String> updateUser(@RequestBody UserUpdateDTO userUpdateDTO, @RequestHeader("id") Long id) {
+        String message = userService.updateUser(userUpdateDTO, id);
 
         return ResponseEntity.ok(message);
     }

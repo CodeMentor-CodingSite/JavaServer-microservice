@@ -60,8 +60,8 @@ public class JwtUtil {
     public String getToken(ServerHttpRequest request, String type) {
         String token = null;
 
-        if (type.equals("access") && request.getCookies().containsKey("Authorization")) {
-            token = request.getCookies().get("Authorization").get(0).getValue();
+        if (type.equals("access") && request.getCookies().containsKey("access_token")) {
+            token = request.getCookies().get("access_token").get(0).getValue();
         } else if (type.equals("refresh") && request.getCookies().containsKey("refresh_token")) {
             token = request.getCookies().get("refresh_token").get(0).getValue();
         }
