@@ -83,6 +83,7 @@ public class UserService {
                 .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         String nickname = userUpdateDTO.getNickname();
+        checkExistedNickname(nickname);
         if (nickname != null) foundUser.updateNickname(nickname);
 
         String password = userUpdateDTO.getPassword();
@@ -98,10 +99,17 @@ public class UserService {
     }
 
     private void checkExistedUser(UserCreateDTO userCreateDTO) {
-        if (userRepository.existsByEmail(userCreateDTO.getEmail()))
-            throw new UserException(UserErrorEnum.EXIST_EMAIL);
+        checkExistedEmail(userCreateDTO.getEmail());
+        checkExistedNickname(userCreateDTO.getNickname());
+    }
 
-        if (userRepository.existsByNickname(userCreateDTO.getNickname()))
+    private void checkExistedEmail(String email) {
+        if (userRepository.existsByEmail(email))
+            throw new UserException(UserErrorEnum.EXIST_EMAIL);
+    }
+
+    private void checkExistedNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname))
             throw new UserException(UserErrorEnum.EXIST_NICKNAME);
     }
 
