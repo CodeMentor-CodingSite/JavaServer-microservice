@@ -24,4 +24,11 @@ public class CodeMentorException extends RuntimeException {
                 errorEnum.getHttpStatus()
         );
     }
+
+    public ResponseEntity<ErrorDto> getResponse(ErrorEnum errorEnum) {
+        return new ResponseEntity<>(
+                errorEnum.getErrorDto(),
+                errorEnum.getHttpStatus()
+        );
+    }
 }
