@@ -2,7 +2,7 @@ package com.codementor.service;
 
 import com.codementor.core.exception.CodeMentorException;
 import com.codementor.core.exception.ErrorEnum;
-import com.codementor.dto.evaluation.EvalTestCaseDto;
+import com.codementor.dto.evaluation.EvalQuestionTestCaseDto;
 import com.codementor.dto.evaluation.EvaluationDto;
 import com.codementor.entity.ExecuteResult;
 import com.codementor.entity.ExecuteUsercode;
@@ -39,6 +39,7 @@ public class UserCodeExecutionResponseConsumer {
         } else {
             executeUsercode.updateWithGptEvaluationWith(evaluationDto); // 3.
         }
+        executeUsercodeRepository.save(executeUsercode);
     }
 
     /**
@@ -47,11 +48,11 @@ public class UserCodeExecutionResponseConsumer {
      * @param executeUsercode 기존 결과가 저장되어있지 않은 execute_usercode 엔터티
      */
     private void saveExecuteResultForEachTestCases(EvaluationDto evaluationDto, ExecuteUsercode executeUsercode) {
-        for (EvalTestCaseDto evalTestCaseDto : evaluationDto.getTestCaseDtoList()) {
+        for (EvalQuestionTestCaseDto evalQuestionTestCaseDto : evaluationDto.getTestCaseDtoList()) {
             ExecuteResult executeResult = ExecuteResult.builder()
                     .executeUsercode(executeUsercode)
-                    .questionTestCaseId(evalTestCaseDto.getTestCaseId())
-                    .testcaseResult(evalTestCaseDto.getTestCaseResult())
+                    .questionTestCaseId(evalQuestionTestCaseDto.getTestCaseId())
+                    .testcaseResult(evalQuestionTestCaseDto.getTestCaseResult())
                     .build();
             executeResultRepository.save(executeResult);
         }
