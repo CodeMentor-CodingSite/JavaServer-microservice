@@ -15,4 +15,15 @@ public class EvalQuestionTestCaseDto {
     private Boolean isExample;
     private String explanation;
     private List<EvalQuestionTestCaseDetailAndConverterDto> evalTestCaseDetailAndConverterDtos;
+    private String testCaseResult;
+
+    @Override
+    public String toString() {
+        return "EvalQuestionTestCaseDto{" + '\n' +
+                "testCaseId=" + testCaseId +'\n' +
+                ", isExample=" + isExample +'\n' +
+                ", explanation='" + explanation + '\'' +'\n' +
+                ", evalTestCaseDetailAndConverterDtos=" + evalTestCaseDetailAndConverterDtos.toString() +'\n' +
+                '}';
+    }
 }
