@@ -139,7 +139,18 @@ public class ChatService {
 
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 // Directly return the response body as a string
-                return responseEntity.getBody();
+                String responseBody = responseEntity.getBody();
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(responseBody);
+
+                JsonNode choicesNode = rootNode.get("choices");
+                if (!choicesNode.isMissingNode() && choicesNode.isArray() && choicesNode.has(0)) {
+                    JsonNode contentNode = choicesNode.get(0).path("message").path("content");
+                    if (!contentNode.isMissingNode()) {
+                        return contentNode.asText();
+                    }
+                }
             }
         } catch (Exception e) {
             // Handle specific exceptions
