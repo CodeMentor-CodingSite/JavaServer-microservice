@@ -24,7 +24,7 @@ public class ReceiveFromKafka {
     public void userCodeResultListener(String jsonMessage) {
         try {
             EvaluationDto evaluationDto = objectMapper.readValue(jsonMessage, EvaluationDto.class);
-            System.out.println("Consumer: " + evaluationDto);
+            System.out.println("Consumer: " + evaluationDto.toString());
             userCodeExecutionResponseConsumer.receivedEvaluationResult(evaluationDto);
         } catch (Exception e) {
             throw new CodeMentorException(ErrorEnum.KAFKA_CONSUMER_ERROR);
