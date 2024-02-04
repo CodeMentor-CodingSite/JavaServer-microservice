@@ -13,8 +13,8 @@ public class Producer {
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private static final String TOPIC_NAME = "test";
-    private static final String GROUP_ID = "test";
+    private static final String TOPIC_NAME = "testing";
+    private static final String GROUP_ID = "testing";
 
     public void sendToKafka(MessageDTO messageDTO) {
         System.out.println("Producer: " + messageDTO);
@@ -23,6 +23,7 @@ public class Producer {
             kafkaTemplate.send(TOPIC_NAME, jsonInString);
             System.out.println("Message sent to Kafka");
         } catch (JsonProcessingException e) {
+            System.out.println("Error: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
