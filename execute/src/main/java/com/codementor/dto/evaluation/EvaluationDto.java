@@ -21,7 +21,7 @@ public class EvaluationDto {
     private List<String> questionConstraints;
 
 
-    private List<EvalTestCaseDto> testCaseDtoList;
+    private List<EvalQuestionTestCaseDto> testCaseDtoList;
     private String answerCheckContent;
 
 
@@ -39,5 +39,26 @@ public class EvaluationDto {
         this.userLanguage = userCodeExecutionRequest.getUserLanguage();
         this.userCode = userCodeExecutionRequest.getUserCode();
         this.executeUserCodeId = executeUserCodeId;
+    }
+
+
+    @Override
+    public String toString(){
+        return "EvaluationDto{" +'\n' +
+                "questionId=" + questionId +'\n' +
+                ", questionTitle='" + questionTitle + '\'' + '\n' +
+                ", questionContent='" + questionContent + '\'' +'\n' +
+                ", questionCategory='" + questionCategory + '\'' +'\n' +
+                ", questionConstraints=" + questionConstraints +'\n' +
+                ", testCaseDtoList=" + testCaseDtoList.toString() +'\n' +
+                ", answerCheckContent='" + answerCheckContent + '\'' +'\n' +
+                ", userId=" + userId +'\n' +
+                ", userLanguage='" + userLanguage + '\'' +'\n' +
+                ", userCode='" + userCode + '\'' +'\n' +
+                ", executeUserCodeId=" + executeUserCodeId +'\n' +
+                ", executeTime=" + executeTime +'\n' +
+                ", testCaseResults=" + testCaseResults +'\n' +
+                ", gptEvaluation='" + gptEvaluation + '\'' +'\n' +
+                '}';
     }
 }
