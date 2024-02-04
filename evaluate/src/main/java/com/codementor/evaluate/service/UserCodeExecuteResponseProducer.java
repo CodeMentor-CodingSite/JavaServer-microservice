@@ -25,7 +25,7 @@ public class UserCodeExecuteResponseProducer {
      * @param evaluationResult
      */
     public void sendToKafka(EvaluationDto evaluationResult) {
-        System.out.println("Producer: " + evaluationResult);
+        System.out.println("Producer: \n" + evaluationResult.toString());
         try{
             String jsonInString = objectMapper.writeValueAsString(evaluationResult);
             kafkaTemplate.send(TOPIC_NAME, jsonInString);
