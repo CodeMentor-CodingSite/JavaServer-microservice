@@ -36,7 +36,10 @@ public class ExecuteUsercodeController {
      * @return 성공 메시지
      */
     @PostMapping("/api/execute/userCode")
-    public ResponseDto evaluateUserCode(@RequestBody UserCodeExecutionRequest userCodeExecutionRequest) {
+    public ResponseDto evaluateUserCode(@RequestHeader("userId") Long userId,
+                                        @RequestBody UserCodeExecutionRequest userCodeExecutionRequest) {
+        userId = 1L; //Todo : remove this line
+        userCodeExecutionRequest.setUserId(userId);
         userCodeExecutionRequestProducer.sendUserCodeExecutionRequestToKafka(userCodeExecutionRequest);
         return ResponseDto.ok("user code sent to execution kafka topic");
     }
