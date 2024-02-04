@@ -88,6 +88,9 @@ public class ExecutionHelperService {
 
         // QuestionTestCase와 연결된 QuestionTestCaseDetail들을 순회
         for (QuestionTestCaseDetail testCaseDetail : questionTestCase.getQuestionTestCaseDetails()) {
+            EvalTestCaseDetailAndConverterDto tcAndConv = new EvalTestCaseDetailAndConverterDto();
+            tcAndConv.setTestCaseKey(testCaseDetail.getKey());
+            tcAndConv.setTestCaseValue(testCaseDetail.getValue());
 
             // 각 QuestionTestCaseDetail에 연결된 ConverterMap들 중에서 해당 Language에 해당하는 Converter 찾기
             for (ConverterMap converterMap : testCaseDetail.getConverterMaps()) {
@@ -95,16 +98,12 @@ public class ExecutionHelperService {
 
                 // 해당 Language와 연결된 Converter만 처리
                 if (converter!=null && converter.getLanguage().equals(language)) {
-                    EvalTestCaseDetailAndConverterDto tcAndConv = EvalTestCaseDetailAndConverterDto.builder()
-                            .codeExecConverterContent(converter.getContent())
-                            .returnType(converter.getReturnType())
-                            .methodName(converter.getMethodName())
-                            .testCaseKey(testCaseDetail.getKey())
-                            .testCaseValue(testCaseDetail.getValue())
-                            .build();
-                    resultList.add(tcAndConv);
+                    tcAndConv.setCodeExecConverterContent(converter.getContent());
+                    tcAndConv.setReturnType(converter.getReturnType());
+                    tcAndConv.setMethodName(converter.getMethodName());
                 }
             }
+            resultList.add(tcAndConv);
         }
         return resultList;
     }
