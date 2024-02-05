@@ -115,27 +115,27 @@ public class EvaluationService {
     // Todo : 코드 실행 서버와 연결하고, 결과값 받아오기
     private String sendRequestToExecuteServer(String codeExecutionStringCommand) {
 
-        // send request to execute server
-//        if (session == null || !session.isConnected()) {
-//            sshSessionOpen();
-//        }
-        // Execute command
-        return "True";
-//        return executeCode(codeExecutionStringCommand);
+//         send request to execute server
+        if (session == null || !session.isConnected()) {
+            sshSessionOpen();
+        }
+//         Execute command
+
+        return executeCode(codeExecutionStringCommand);
     }
 
     private void sshSessionOpen() {
-        JSch jSch = new JSch();
-
         try {
-            session = jSch.getSession(USERNAME, HOST, PORT);
+            session = new JSch().getSession(USERNAME, HOST, PORT);
             session.setPassword(PASSWORD);
+
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
         } catch (JSchException e) {
-            // Todo. exception
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+
+        System.out.println("New Session Open");
     }
 
     // ssh 세션 활용한 Exec 채널로 코드 실행 및 결과 반환
