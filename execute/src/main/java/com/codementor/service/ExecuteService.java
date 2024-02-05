@@ -1,9 +1,7 @@
 package com.codementor.service;
 
 import com.codementor.core.util.RequestToServer;
-import com.codementor.dto.UserSolvedCategoryDtoList;
-import com.codementor.dto.UserSolvedRatioSubmitDto;
-import com.codementor.dto.UserSolvedRatioTotalDto;
+import com.codementor.dto.*;
 import com.codementor.dto.external.QuestionDifficultyCounts;
 import com.codementor.dto.external.UserSolvedQuestionIdList;
 import com.codementor.entity.ExecuteUsercode;
@@ -14,7 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +33,7 @@ public class ExecuteService {
 
     /**
      * 유저가 푼 문제 수와 제출한 문제 수를 가져온다.
+     *
      * @param userId 유저 아이디
      * @return 유저가 푼 문제 수와 제출한 문제 수
      */
@@ -50,6 +51,7 @@ public class ExecuteService {
 
     /**
      * 유저가 푼 문제 수와 전체 문제 수를 가져온다.
+     *
      * @param userId 유저 아이디
      * @return 유저가 푼 문제 수와 전체 문제 수
      * 1. 풀었던 문제 엔터티 리스트를 가져온다.
@@ -77,6 +79,7 @@ public class ExecuteService {
 
     /**
      * 유저가 푼 문제에 대한 카테고리와 난이도가 포함된 정보를 가져온다.
+     *
      * @param userId 유저 아이디
      * @return 유저가 푼 문제에 대한 카테고리와 난이도가 포함된 정보
      * 1. 풀었던 문제 엔터티 리스트를 가져온다.
@@ -91,6 +94,21 @@ public class ExecuteService {
                 .build();
         String userSolvedCategoryUrl = questionUrl + "/api/external/getUserSolvedCategory";
         return requestToServer.postDataToServer(userSolvedCategoryUrl, sendDto, UserSolvedCategoryDtoList.class);
+    }
+
+    public UserUsedLanguagesDtoList getUserUsedLanguages(Long userId) {
+        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
+        Map<String, Integer> collectedLanguages = executeUsercodeList.stream()
+                .filter(ExecuteUsercode::getIsCorrect)
+                .sorted(Comparator.comparing(ExecuteUsercode::getUserLanguage))
+                .collect(Collectors.groupingBy(ExecuteUsercode::getUserLanguage, Collectors.summingInt(e -> 1)));
+
+        List<UserUsedLanguagesDto> userUsedLanguagesDtoList = collectedLanguages.keySet()
+                .stream()
+                .map(key -> new UserUsedLanguagesDto(key, collectedLanguages.get(key)))
+                .collect(Collectors.toList());
+
+        return new UserUsedLanguagesDtoList(userUsedLanguagesDtoList);
     }
 
     //풀었던 문제 엔터티들의 Id를 가져온다.
