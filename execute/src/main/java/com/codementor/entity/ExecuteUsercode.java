@@ -52,7 +52,7 @@ public class ExecuteUsercode {
         // 문제 정답 여부 판단
         boolean isCorrect = true;
         for (EvalQuestionTestCaseDto evalQuestionTestCaseDto : evaluationDto.getTestCaseDtoList()) {
-            if (evalQuestionTestCaseDto.getTestCaseResult().equals("False")) {
+            if (evalQuestionTestCaseDto.getTestCaseResult().equals("False\n")) {
                 isCorrect = false;
                 break;
             }

@@ -60,7 +60,7 @@ public class UserCodeExecuteRequestConsumer {
      */
     @Async
     protected void sendToKafkaWithExecutionResults(EvaluationDto evaluationDto){
-        Long startTime = System.nanoTime();
+        long startTime = System.nanoTime();
         // 코드 실행에 대한 결과 값들이 담긴 배열
         ArrayList<String> executionResults = evaluationService.processExecutionResults(evaluationDto);
         Long durationInMillis = (System.nanoTime() - startTime) / 1000000;

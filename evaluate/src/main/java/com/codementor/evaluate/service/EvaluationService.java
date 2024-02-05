@@ -51,7 +51,7 @@ public class EvaluationService {
         // 각 커멘트 프롬프트를 실행하고 결과 값을 받아옴
         for (String executionPrompt : executionPrompts) {
             System.out.println(executionPrompt);
-            String executionResult = sendRequestToExecuteServer(executionPrompt);
+            String executionResult = sendRequestToExecuteServer(executionPrompt); //Todo: \n is not needed. use string.trim()
             System.out.println(executionResult);
             executionResults.add(executionResult);
         }
