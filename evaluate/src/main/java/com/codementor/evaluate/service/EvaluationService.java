@@ -36,11 +36,12 @@ public class EvaluationService {
     private static Session session;
     private static Channel channel;
 
-    /** 코드 실행 서버에 코드 실행 요청을 보내고, 결과 값을 받아옴
+    /**
+     * 코드 실행 서버에 코드 실행 요청을 보내고, 결과 값을 받아옴
      * @param evaluationDto 코드 실행에 필요한 정보들이 담긴 객체
      * @return
      */
-    public ArrayList<String> processExecutionResults(EvaluationDto evaluationDto){
+    public ArrayList<String> processExecutionResults(EvaluationDto evaluationDto) {
         // 코드 실행에 대한 결과 값들을 답는 배열
         ArrayList<String> executionResults = new ArrayList<>();
 
@@ -71,7 +72,6 @@ public class EvaluationService {
         // Answer Check 관련
         String answerCheckContent = evaluationDto.getAnswerCheckContent();
 
-
         for (EvalQuestionTestCaseDto questionTestCaseDto : questionTestCaseDtoList) {
             String pythonScript = "";
             List<EvalQuestionTestCaseDetailAndConverterDto> questionTestCaseDetailsDtoList = questionTestCaseDto.getEvalTestCaseDetailAndConverterDtos();
@@ -90,13 +90,12 @@ public class EvaluationService {
                 String methodName = tcAndcDto.getMethodName();
 
                 pythonScript += key + " = " + value;
+                pythonScript += "\n";
 
                 if (codeExecConverterContent != null) {
                     pythonScript += codeExecConverterContent;
                     pythonScript += "\n";
                     pythonScript += key + " = " + methodName + "(" + value + ")";
-                } else {
-                    pythonScript += key + " = " + value;
                 }
 
                 pythonScript += "\n";
@@ -117,12 +116,14 @@ public class EvaluationService {
     private String sendRequestToExecuteServer(String codeExecutionStringCommand) {
 
         // send request to execute server
-        if (session == null || !session.isConnected()) {
-            sshSessionOpen();
-        }
+//        if (session == null || !session.isConnected()) {
+//            sshSessionOpen();
+//        }
         // Execute command
-        return executeCode(codeExecutionStringCommand);
+        return "True";
+//        return executeCode(codeExecutionStringCommand);
     }
+
     private void sshSessionOpen() {
         JSch jSch = new JSch();
 

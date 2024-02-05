@@ -18,4 +18,15 @@ public class EvalQuestionTestCaseDetailAndConverterDto {
     // QuestionTestCaseDetail 필드
     private String testCaseKey;
     private String testCaseValue;
+
+    @Override
+    public String toString() {
+        return "EvalQuestionTestCaseDetailAndConverterDto{" +'\n' +
+                "codeExecConverterContent='" + codeExecConverterContent + '\'' +'\n' +
+                ", returnType='" + returnType + '\'' +'\n' +
+                ", methodName='" + methodName + '\'' +'\n' +
+                ", testCaseKey='" + testCaseKey + '\'' +'\n' +
+                ", testCaseValue='" + testCaseValue + '\'' +'\n' +
+                '}';
+    }
 }

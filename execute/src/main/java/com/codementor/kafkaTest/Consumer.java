@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class Consumer {
 
-    private static final String TOPIC_NAME = "test";
-    private static final String GROUP_ID = "test";
+    private static final String TOPIC_NAME = "testing";
+    private static final String GROUP_ID = "testing";
 
     private final ObjectMapper objectMapper;
 

@@ -60,10 +60,17 @@ public class UserCodeExecuteRequestConsumer {
      */
     @Async
     protected void sendToKafkaWithExecutionResults(EvaluationDto evaluationDto){
+        Long startTime = System.nanoTime();
         // 코드 실행에 대한 결과 값들이 담긴 배열
         ArrayList<String> executionResults = evaluationService.processExecutionResults(evaluationDto);
+        Long durationInMillis = (System.nanoTime() - startTime) / 1000000;
         // 코드 실행에 대한 결과 값들을 기존 EvaluationDto에 담음
+        for (int i = 0; i < executionResults.size(); i++) {
+            evaluationDto.getTestCaseDtoList().get(i).setTestCaseResult(executionResults.get(i));
+        }
+
         evaluationDto.setTestCaseResults(executionResults);
+        evaluationDto.setExecuteTime(durationInMillis);
         // Kafka 에 결과값 전송
         userCodeExecuteResponseProducer.sendToKafka(evaluationDto);
     }

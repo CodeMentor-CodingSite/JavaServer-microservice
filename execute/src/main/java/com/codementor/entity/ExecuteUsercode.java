@@ -1,6 +1,6 @@
 package com.codementor.entity;
 
-import com.codementor.dto.evaluation.EvalTestCaseDto;
+import com.codementor.dto.evaluation.EvalQuestionTestCaseDto;
 import com.codementor.dto.evaluation.EvaluationDto;
 import lombok.*;
 
@@ -51,8 +51,8 @@ public class ExecuteUsercode {
         this.executeTime = evaluationDto.getExecuteTime();
         // 문제 정답 여부 판단
         boolean isCorrect = true;
-        for (EvalTestCaseDto evalTestCaseDto : evaluationDto.getTestCaseDtoList()) {
-            if (evalTestCaseDto.getTestCaseResult().equals("False")) {
+        for (EvalQuestionTestCaseDto evalQuestionTestCaseDto : evaluationDto.getTestCaseDtoList()) {
+            if (evalQuestionTestCaseDto.getTestCaseResult().equals("False")) {
                 isCorrect = false;
                 break;
             }

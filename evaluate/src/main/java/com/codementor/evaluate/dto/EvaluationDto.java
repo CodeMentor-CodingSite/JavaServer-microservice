@@ -56,4 +56,24 @@ public class EvaluationDto {
     private Long executeTime;
     private List<String> testCaseResults;
     private String gptEvaluation;
+
+    @Override
+    public String toString(){
+        return "EvaluationDto{" +'\n' +
+                "questionId=" + questionId +'\n' +
+                ", questionTitle='" + questionTitle + '\'' + '\n' +
+                ", questionContent='" + questionContent + '\'' +'\n' +
+                ", questionCategory='" + questionCategory + '\'' +'\n' +
+                ", questionConstraints=" + questionConstraints +'\n' +
+                ", testCaseDtoList=" + testCaseDtoList.toString() +'\n' +
+                ", answerCheckContent='" + answerCheckContent + '\'' +'\n' +
+                ", userId=" + userId +'\n' +
+                ", userLanguage='" + userLanguage + '\'' +'\n' +
+                ", userCode='" + userCode + '\'' +'\n' +
+                ", executeUserCodeId=" + executeUserCodeId +'\n' +
+                ", executeTime=" + executeTime +'\n' +
+                ", testCaseResults=" + testCaseResults +'\n' +
+                ", gptEvaluation='" + gptEvaluation + '\'' +'\n' +
+                '}';
+    }
 }
