@@ -39,4 +39,15 @@ public class QuestionHelperService {
                 .solvedQuestions(new ArrayList<>(solvedQuestionIds))
                 .build();
     }
+
+    public List<Long> getCorrectUserQuestionIdList(Long userId) {
+        List<ExecuteUsercode> executeUsercodes = executeUsercodeRepository.findAllByUserId(userId);
+        HashSet<Long> correctUserQuestionIdList = new HashSet<>();
+        for (ExecuteUsercode executeUsercode : executeUsercodes) {
+            if (executeUsercode.getIsCorrect()) {
+                correctUserQuestionIdList.add(executeUsercode.getQuestionId());
+            }
+        }
+        return new ArrayList<Long>(correctUserQuestionIdList);
+    }
 }
