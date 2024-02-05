@@ -1,6 +1,7 @@
 package com.codementor.controller;
 
 import com.codementor.core.dto.ResponseDto;
+import com.codementor.dto.UserUsedLanguagesDtoList;
 import com.codementor.service.ExecuteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +42,11 @@ public class ExecuteController {
     @GetMapping("/api/execute/problem/solved/category")
     public ResponseDto getUserSolvedQuestionCategory(@RequestHeader("userId") Long userId){
         return ResponseDto.ok(executeService.getUserSolvedQuestion(userId));
+    }
+
+    @GetMapping("/api/execute/problem/solved/language")
+    public ResponseDto<UserUsedLanguagesDtoList> getUserUsedLanguages(@RequestHeader("id") Long id) {
+        return ResponseDto.ok(executeService.getUserUsedLanguages(id));
     }
 
 }
