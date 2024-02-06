@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codementor-user-deployment
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codementor-user
+      tier: backend
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: codementor-user
+        tier: backend
+        track: stable
+        springboot: user
+    spec:
+      containers:
+        - name: codementor-user
+          image: lkh66913/codementor-user:20240126113111757
+          ports:
+            - containerPort: 8080
