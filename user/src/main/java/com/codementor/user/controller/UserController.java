@@ -69,4 +69,11 @@ public class UserController {
 
         return ResponseEntity.ok(message);
     }
+
+    @PostMapping("/likes/{questionId}")
+    public ResponseEntity<String> toggleLike(@PathVariable("questionId") Long questionId, @RequestHeader("id") Long id) {
+        String message = userService.toggleLike(questionId, id);
+
+        return ResponseEntity.ok(message);
+    }
 }
