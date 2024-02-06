@@ -3,19 +3,23 @@ package com.codementor.user.service;
 import com.codementor.user.config.JwtProvider;
 import com.codementor.user.dto.*;
 import com.codementor.user.entity.User;
+import com.codementor.user.entity.UserLike;
 import com.codementor.user.exception.UserErrorEnum;
 import com.codementor.user.exception.UserException;
+import com.codementor.user.repository.UserLikeRepository;
 import com.codementor.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserLikeRepository userLikeRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
@@ -89,6 +93,24 @@ public class UserService {
         String password = userUpdateDTO.getPassword();
         if (password != null) changePassword(password, foundUser);
 
+
+        return "Success";
+    }
+
+    public String toggleLike(Long questionId, Long userId) {
+        User foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+
+        Optional<UserLike> userLike = userLikeRepository.findOneByQuestionIdAndUserId(questionId, foundUser.getId());
+
+        if (userLike.isEmpty()) {
+            userLikeRepository.save(UserLike.builder()
+                    .questionId(questionId)
+                    .user(foundUser)
+                    .build());
+        } else {
+            userLikeRepository.delete(userLike.get());
+        }
 
         return "Success";
     }
