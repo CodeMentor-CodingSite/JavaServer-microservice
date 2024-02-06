@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: codementor-execute
+  name: codementor-execute
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: codementor-execute
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: codementor-execute
+    spec:
+      containers:
+        - image: lkh66913/myssh
+          name: codementor-execute

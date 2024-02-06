@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codementor-execute-deployment
+  namespace: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codementor-execute
+      tier: backend
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: codementor-execute
+        tier: backend
+        track: stable
+        springboot: execute
+    spec:
+      containers:
+        - name: codementor-execute
+          image: lkh66913/codementor-execute
+          ports:
+            - containerPort: 8080
