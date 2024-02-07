@@ -13,9 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 코드 실행 서버와 관련된 서비스
@@ -38,6 +37,7 @@ public class EvaluationService {
 
     /**
      * 코드 실행 서버에 코드 실행 요청을 보내고, 결과 값을 받아옴
+     *
      * @param evaluationDto 코드 실행에 필요한 정보들이 담긴 객체
      * @return
      */
@@ -45,8 +45,15 @@ public class EvaluationService {
         // 코드 실행에 대한 결과 값들을 답는 배열
         ArrayList<String> executionResults = new ArrayList<>();
 
-        // 코드 실행을 위한 커멘트 프롬프트를 생성
-        ArrayList<String> executionPrompts = constructPythonCodeExecutionStringCommand(evaluationDto);
+        // 최종 코드 완성 배열
+        ArrayList<String> executionPrompts = new ArrayList<>();
+
+        // 코드 실행을 위한 커멘트 프롬프트를 생성 ( java / python 구분 )
+        if (evaluationDto.getUserLanguage().equals("Python")) {
+            executionPrompts = constructPythonCodeExecutionStringCommand(evaluationDto);
+        } else if (evaluationDto.getUserLanguage().equals("Java")) {
+            executionPrompts = constructJavaCodeExecutionStringCommand(evaluationDto);
+        }
 
         // 각 커멘트 프롬프트를 실행하고 결과 값을 받아옴
         for (String executionPrompt : executionPrompts) {
@@ -107,6 +114,57 @@ public class EvaluationService {
 
             String command = "python3 -c \"" + pythonScript + "\"";
             prompts.add(command);
+        }
+
+        return prompts;
+    }
+
+    private ArrayList<String> constructJavaCodeExecutionStringCommand(EvaluationDto evaluationDto) {
+        ArrayList<String> prompts = new ArrayList<>();
+
+        // TestCase 관련
+        List<EvalQuestionTestCaseDto> questionTestCaseDtoList = evaluationDto.getTestCaseDtoList();
+
+        for (EvalQuestionTestCaseDto questionTestCaseDto : questionTestCaseDtoList) {
+            // RealMain Class
+            StringBuilder finalCode = new StringBuilder("echo 'import java.util.*;").append("\n\n\n")
+                    .append("public class RealMain {\n");
+
+            // converter ( set - 중복 제거 )
+            questionTestCaseDto.getEvalTestCaseDetailAndConverterDtos()
+                    .stream()
+                    .map(EvalQuestionTestCaseDetailAndConverterDto::getCodeExecConverterContent)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet())
+                    .forEach(i -> finalCode.append(i).append("\n\n"));
+
+            // main method
+            finalCode.append(
+                    "    public static void main(String[] args) throws Exception{\n" +
+                            "        Solution solution = new Solution();\n" +
+                            "\n");
+
+            // parameter
+            questionTestCaseDto.getEvalTestCaseDetailAndConverterDtos()
+                    .forEach(
+                            i -> finalCode.append("        ")
+                                    .append(i.getReturnType()).append(" ")
+                                    .append(i.getTestCaseKey()).append(" = ")
+                                    .append(i.getMethodName()).append("(\"")
+                                    .append(i.getTestCaseValue()).append("\");\n")
+                    );
+
+            // answer check
+            finalCode.append("\n        ").append(evaluationDto.getAnswerCheckContent()).append("\n")
+                    .append("    }").append("\n\n");
+
+            finalCode.append("    static ").append(evaluationDto.getUserCode()).append("\n")
+                    .append("}\n\n");
+
+            // java 실행
+            finalCode.append("' > RealMain.java && javac -encoding ISO-8859-1 RealMain.java && timeout -s 9 5s java -Xmx128m RealMain");
+
+            prompts.add(finalCode.toString());
         }
 
         return prompts;
