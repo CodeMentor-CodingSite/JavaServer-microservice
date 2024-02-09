@@ -150,8 +150,14 @@ public class ExecuteService {
         return new PageImpl<>(finalResponse, pageableWithSort, finalResponse.size());
     }
 
-    public ExecuteUsercodeDto userCodeHistory(Long userId, Long usercodeId) {
+    public ExecuteUsercodeDto usercodeHistory(Long userId, Long usercodeId) {
         return ExecuteUsercodeDto.from(executeUsercodeRepository.findById(usercodeId).orElseThrow());
+    }
+
+    public List<ExecuteUsercodeDto> allUsercodeHistory(Long userId, Long questionId) {
+        return executeUsercodeRepository.findAllByUserIdAndQuestionId(userId, questionId).stream()
+                .map(ExecuteUsercodeDto::from)
+                .collect(Collectors.toList());
     }
 
     //풀었던 문제 엔터티들의 Id를 가져온다.
