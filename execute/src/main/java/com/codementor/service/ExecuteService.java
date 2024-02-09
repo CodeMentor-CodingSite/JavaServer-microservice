@@ -160,6 +160,7 @@ public class ExecuteService {
                 .collect(Collectors.toList());
     }
 
+
     //풀었던 문제 엔터티들의 Id를 가져온다.
     private List<Long> getSolvedExecuteUserCodeList(Long userId) {
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
