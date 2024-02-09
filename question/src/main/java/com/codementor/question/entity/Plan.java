@@ -21,8 +21,8 @@ public class Plan {
     @Column(name = "plan_name", columnDefinition = "VARCHAR(50)")
     private String planName;
 
-    @Column(name = "plan_explanation", columnDefinition = "TEXT")
-    private String planExplanation;
+    @Column(name = "plan_description", columnDefinition = "TEXT")
+    private String planDescription;
 
     @OneToMany(mappedBy = "plan")
     private List<PlanMap> planMaps;
