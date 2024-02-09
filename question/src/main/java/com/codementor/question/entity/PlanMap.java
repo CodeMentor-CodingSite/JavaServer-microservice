@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "package_map")
+@Table(name = "plan_map")
 public class PlanMap {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
