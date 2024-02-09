@@ -84,10 +84,7 @@ public class ExecuteService {
     public UserSolvedCategoryDtoList getUserSolvedQuestion(Long userId) {
         List<Long> correctQuestionIdList = getSolvedExecuteUserCodeList(userId); // 1.
 
-        UserSolvedQuestionIdList sendDto = UserSolvedQuestionIdList.builder() // 2.
-                .userId(userId)
-                .problemIdList(correctQuestionIdList)
-                .build();
+        UserSolvedQuestionIdList sendDto = UserSolvedQuestionIdList.of(userId, correctQuestionIdList); // 2.
         String userSolvedCategoryUrl = questionUrl + "/api/external/getUserSolvedCategory";
         return requestToServer.postDataToServer(userSolvedCategoryUrl, sendDto, UserSolvedCategoryDtoList.class);
     }
@@ -151,7 +148,7 @@ public class ExecuteService {
     }
 
     public ExecuteUsercodeDto usercodeHistory(Long userId, Long usercodeId) {
-        return ExecuteUsercodeDto.from(executeUsercodeRepository.findById(usercodeId).orElseThrow());
+        return ExecuteUsercodeDto.from(executeUsercodeRepository.findByIdAndUsercodeId(userId, usercodeId));
     }
 
     public List<ExecuteUsercodeDto> allUsercodeHistory(Long userId, Long questionId) {
