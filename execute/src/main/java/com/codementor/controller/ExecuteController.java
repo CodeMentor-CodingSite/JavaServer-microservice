@@ -1,16 +1,14 @@
 package com.codementor.controller;
 
 import com.codementor.core.dto.ResponseDto;
+import com.codementor.dto.ExecuteUsercodeDto;
 import com.codementor.dto.UserUsedLanguagesDtoList;
 import com.codementor.dto.response.UserSolvedQuestionIdAndTitleAndTimeResponse;
 import com.codementor.dto.response.UserSubmitHistoryResponse;
 import com.codementor.service.ExecuteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,5 +66,10 @@ public class ExecuteController {
             @RequestParam("page") int page,
             @RequestParam("size") int size) {
         return executeService.userSubmitHistory(userId, page, size);
+    }
+
+    @GetMapping("/api/execute/{usercodeId}")
+    public ResponseDto<ExecuteUsercodeDto> userCodeHistory(@RequestHeader("userId") Long userId, @PathVariable Long usercodeId) {
+        return ResponseDto.ok(executeService.userCodeHistory(userId, usercodeId));
     }
 }
