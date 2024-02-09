@@ -9,5 +9,7 @@ public interface ExecuteUsercodeRepository extends JpaRepository<ExecuteUsercode
 
     List<ExecuteUsercode> findAllByUserId(Long userId);
 
+    List<ExecuteUsercode> findAllByUserIdAndQuestionId(Long userId, Long questionId);
+
     List<ExecuteUsercode> findAllByUserIdAndIsCorrect(Long userId, Boolean isCorrect);
 }

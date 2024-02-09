@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ExecuteController {
@@ -70,6 +72,11 @@ public class ExecuteController {
 
     @GetMapping("/api/execute/{usercodeId}")
     public ResponseDto<ExecuteUsercodeDto> userCodeHistory(@RequestHeader("userId") Long userId, @PathVariable Long usercodeId) {
-        return ResponseDto.ok(executeService.userCodeHistory(userId, usercodeId));
+        return ResponseDto.ok(executeService.usercodeHistory(userId, usercodeId));
+    }
+
+    @GetMapping("/api/execute/all/{questionId}")
+    public ResponseDto<List<ExecuteUsercodeDto>> allUserCodeHistory(@RequestHeader("userId") Long userId, @PathVariable Long questionId) {
+        return ResponseDto.ok(executeService.allUsercodeHistory(userId, questionId));
     }
 }
