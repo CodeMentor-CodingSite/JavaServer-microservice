@@ -150,6 +150,9 @@ public class ExecuteService {
         return new PageImpl<>(finalResponse, pageableWithSort, finalResponse.size());
     }
 
+    public ExecuteUsercodeDto userCodeHistory(Long userId, Long usercodeId) {
+        return ExecuteUsercodeDto.from(executeUsercodeRepository.findById(usercodeId).orElseThrow());
+    }
 
     //풀었던 문제 엔터티들의 Id를 가져온다.
     private List<Long> getSolvedExecuteUserCodeList(Long userId) {
