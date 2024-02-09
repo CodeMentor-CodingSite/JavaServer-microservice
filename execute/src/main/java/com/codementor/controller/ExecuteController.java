@@ -3,6 +3,7 @@ package com.codementor.controller;
 import com.codementor.core.dto.ResponseDto;
 import com.codementor.dto.UserUsedLanguagesDtoList;
 import com.codementor.dto.response.UserSolvedQuestionIdAndTitleAndTimeResponse;
+import com.codementor.dto.response.UserSubmitHistoryResponse;
 import com.codementor.service.ExecuteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -59,5 +60,13 @@ public class ExecuteController {
             @RequestParam("size") int size,
             @RequestParam("difficulty") String difficulty) {
         return executeService.userSolvedQuestionIdAndTitleAndTime(userId, page, size, difficulty);
+    }
+
+    @GetMapping("/api/execute/problem/all")
+    public Page<UserSubmitHistoryResponse> getUserSubmitHistory(
+            @RequestHeader("userId") Long userId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size) {
+        return executeService.userSubmitHistory(userId, page, size);
     }
 }
