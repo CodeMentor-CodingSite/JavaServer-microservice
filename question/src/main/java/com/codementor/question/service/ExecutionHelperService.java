@@ -183,4 +183,14 @@ public class ExecutionHelperService {
         }
         return newResponse;
     }
+
+    public List<UserSubmitHistoryResponse> getUserSubmitHistory(List<UserSubmitHistoryResponse> request){
+        for (var req : request) {
+            Optional<Question> question = questionRepository.findById(req.getQuestionId());
+            if (question.isPresent()){
+                req.setQuestionName(question.get().getTitle());
+            }
+        }
+        return request;
+    }
 }

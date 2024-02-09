@@ -50,4 +50,9 @@ public class ExternalApiController {
     public List<UserSolvedQuestionIdAndTitleAndTimeResponse> getQuestionNameFromId(@RequestBody List<UserSolvedQuestionIdAndTitleAndTimeResponse> req) {
         return executionHelperService.getQuestionNameFromId(req);
     }
+
+    @PostMapping("/api/external/getSubmitHistory")
+    public List<UserSubmitHistoryResponse> getUserSubmitHistory(@RequestBody List<UserSubmitHistoryResponse> req) {
+        return executionHelperService.getUserSubmitHistory(req);
+    }
 }

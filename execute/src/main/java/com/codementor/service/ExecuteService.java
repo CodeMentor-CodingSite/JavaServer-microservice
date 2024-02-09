@@ -5,6 +5,7 @@ import com.codementor.dto.*;
 import com.codementor.dto.external.QuestionDifficultyCounts;
 import com.codementor.dto.response.UserSolvedQuestionIdAndTitleAndTimeResponse;
 import com.codementor.dto.external.UserSolvedQuestionIdList;
+import com.codementor.dto.response.UserSubmitHistoryResponse;
 import com.codementor.entity.ExecuteUsercode;
 import com.codementor.repository.ExecuteUsercodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -125,6 +126,23 @@ public class ExecuteService {
         String questionNameFromIdUrl = questionUrl + "/api/external/getQuestionTitleAndDifficultyFromId";
         List<UserSolvedQuestionIdAndTitleAndTimeResponse> finalResponse = requestToServer.postDataToServer(
                 questionNameFromIdUrl,
+                responseList,
+                List.class);
+
+        Pageable pageableWithSort = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timeStamp"));
+        return new PageImpl<>(finalResponse, pageableWithSort, finalResponse.size());
+    }
+
+    public Page<UserSubmitHistoryResponse> userSubmitHistory(Long userId, int page, int size) {
+        List<UserSubmitHistoryResponse> responseList = new ArrayList<>();
+        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
+        for (var executeUsercode : executeUsercodeList){
+            responseList.add(UserSubmitHistoryResponse.of(executeUsercode));
+        }
+
+        String helperUrl = questionUrl + "/api/external/getSubmitHistory";
+        List<UserSubmitHistoryResponse> finalResponse = requestToServer.postDataToServer(
+                helperUrl,
                 responseList,
                 List.class);
 
