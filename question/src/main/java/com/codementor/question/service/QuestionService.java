@@ -4,8 +4,6 @@ import com.codementor.question.core.exception.CodeMentorException;
 import com.codementor.question.core.exception.ErrorEnum;
 import com.codementor.question.core.util.RequestToServer;
 import com.codementor.question.dto.external.UserQuestionsStatus;
-import com.codementor.question.dto.PlanDto;
-import com.codementor.question.dto.response.PlanResponse;
 import com.codementor.question.dto.response.QuestionDetailDtoResponse;
 import com.codementor.question.dto.QuestionDto;
 import com.codementor.question.dto.response.QuestionInitCodeResponse;
@@ -110,13 +108,5 @@ public class QuestionService {
                 .findFirst()
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         return new QuestionInitCodeResponse(questionLanguage.getInitContent());
-    }
-
-    /**
-     * PlanEntity를 PlanDto로 변환하여 반환
-     * @return PlanResponse
-     */
-    public PlanResponse getAllPlans() {
-        return new PlanResponse(planRepository.findAll());
     }
 }
