@@ -2,10 +2,13 @@ package com.codementor.controller;
 
 import com.codementor.core.dto.ResponseDto;
 import com.codementor.dto.UserUsedLanguagesDtoList;
+import com.codementor.dto.response.UserSolvedQuestionIdAndTitleAndTimeResponse;
 import com.codementor.service.ExecuteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -45,8 +48,16 @@ public class ExecuteController {
     }
 
     @GetMapping("/api/execute/problem/solved/language")
-    public ResponseDto<UserUsedLanguagesDtoList> getUserUsedLanguages(@RequestHeader("id") Long id) {
-        return ResponseDto.ok(executeService.getUserUsedLanguages(id));
+    public ResponseDto<UserUsedLanguagesDtoList> getUserUsedLanguages(@RequestHeader("userId") Long userId) {
+        return ResponseDto.ok(executeService.getUserUsedLanguages(userId));
     }
 
+    @GetMapping("/api/execute/problem/solved/difficulty/counts")
+    public Page<UserSolvedQuestionIdAndTitleAndTimeResponse> getUserSolvedQuestionIdAndTitleAndTime(
+            @RequestHeader("userId") Long userId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("difficulty") String difficulty) {
+        return executeService.userSolvedQuestionIdAndTitleAndTime(userId, page, size, difficulty);
+    }
 }

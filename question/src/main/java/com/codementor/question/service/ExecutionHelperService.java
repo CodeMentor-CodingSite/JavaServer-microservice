@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,10 +23,6 @@ public class ExecutionHelperService {
     private final LanguageRepository languageRepository;
     private final QuestionLanguageRepository questionLanguageRepository;
     private final QuestionTestCaseRepository questionTestCaseRepository;
-    private final QuestionTestCaseDetailRepository questionTestCaseDetailRepository;
-    private final CodeExecConverterRepository codeExecConverterRepository;
-    private final QuestionConstraintRepository questionConstraintRepository;
-    private final ConverterMapRepository converterMapRepository;
 
 
     public EvaluationDto createEvaluationDto(Long questionId, String userLanguage) {
@@ -46,7 +43,7 @@ public class ExecutionHelperService {
         String answerCheckContent = getAnswerCheckContent(question, language);
 
         //builder
-        EvaluationDto evaluationDto = EvaluationDto.builder()
+        return EvaluationDto.builder()
                 .questionId(questionId)
                 .questionTitle(questionTitle)
                 .questionContent(questionContent)
@@ -55,8 +52,6 @@ public class ExecutionHelperService {
                 .testCaseDtoList(testCaseDtoList)
                 .answerCheckContent(answerCheckContent)
                 .build();
-
-        return evaluationDto;
     }
 
     private String getAnswerCheckContent(Question question, Language language) {
@@ -108,7 +103,7 @@ public class ExecutionHelperService {
         return resultList;
     }
 
-    public QuestionDifficultyCounts getQuestionsDifficultyCounts(){
+    public QuestionDifficultyCounts getAllQuestionsDifficultyCounts(){
         List<Question> questionsList = questionRepository.findAll();
         Long easy = 0L;
         Long medium = 0L;
@@ -118,10 +113,13 @@ public class ExecutionHelperService {
             switch (question.getDifficulty()) {
                 case EASY:
                     easy++;
+                    break;
                 case MEDIUM:
                     medium++;
+                    break;
                 case HARD:
                     hard++;
+                    break;
             }
         }
         return QuestionDifficultyCounts.builder()
@@ -145,10 +143,13 @@ public class ExecutionHelperService {
                 switch (question.getDifficulty()) {
                     case EASY:
                         easyProblemSolvedCount++;
+                        break;
                     case MEDIUM:
                         mediumProblemSolvedCount++;
+                        break;
                     case HARD:
                         hardProblemSolvedCount++;
+                        break;
                 }
             }
         }
@@ -164,5 +165,22 @@ public class ExecutionHelperService {
         return UserSolvedCategoryDtoList.builder()
                 .userSolvedCategoryDtoList(result)
                 .build();
+    }
+
+    public List<UserSolvedQuestionIdAndTitleAndTimeResponse> getQuestionNameFromId(List<UserSolvedQuestionIdAndTitleAndTimeResponse> request) {
+        List<UserSolvedQuestionIdAndTitleAndTimeResponse> newResponse = new ArrayList<>();
+        for (var req : request) {
+            Optional<Question> question = questionRepository.findByIdAndDifficulty(req.getQuestionId(), QuestionDifficulty.valueOf(req.getDifficulty()));
+            if (question.isPresent()){
+                newResponse.add(UserSolvedQuestionIdAndTitleAndTimeResponse.builder()
+                                .usercodeId(req.getUsercodeId())
+                                .questionId(question.get().getId())
+                                .questionTitle(question.get().getTitle())
+                                .difficulty(req.getDifficulty())
+                                .timeStamp(req.getTimeStamp())
+                                .build());
+            }
+        }
+        return newResponse;
     }
 }
