@@ -28,7 +28,16 @@ public class PlanDto {
         return PlanDto.builder()
                 .planId(plan.getId())
                 .planName(plan.getPlanName())
-                .planDescription(plan.getPlanExplanation())
+                .planDescription(plan.getPlanDescription())
+                .questionIdList(questionIdList)
+                .build();
+    }
+
+    public static PlanDto from(Plan plan, List<Long> questionIdList) {
+        return PlanDto.builder()
+                .planId(plan.getId())
+                .planName(plan.getPlanName())
+                .planDescription(plan.getPlanDescription())
                 .questionIdList(questionIdList)
                 .build();
     }
