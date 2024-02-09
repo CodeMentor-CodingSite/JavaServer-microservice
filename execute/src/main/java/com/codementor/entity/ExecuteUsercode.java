@@ -3,8 +3,10 @@ package com.codementor.entity;
 import com.codementor.dto.evaluation.EvalQuestionTestCaseDto;
 import com.codementor.dto.evaluation.EvaluationDto;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -35,8 +37,9 @@ public class ExecuteUsercode {
     @Column(name = "execute_time")
     private Long executeTime;
 
+    @CreationTimestamp
     @Column(name = "time_stamp", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private String timeStamp;
+    private LocalDateTime timeStamp;
 
     @Column(name = "is_correct")
     private Boolean isCorrect = false;
@@ -44,7 +47,7 @@ public class ExecuteUsercode {
     @Column(name = "gpt_evaluation", columnDefinition = "TEXT")
     private String gptEvaluation;
 
-    @OneToMany(mappedBy = "executeUsercode")
+    @OneToMany(mappedBy = "executeUsercode", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExecuteResult> executeResults;
 
     public void updateWithIsCorrectAndExecuteTimeWith(EvaluationDto evaluationDto) {
@@ -63,4 +66,5 @@ public class ExecuteUsercode {
     public void updateWithGptEvaluationWith(EvaluationDto evaluationDto) {
         this.gptEvaluation = evaluationDto.getGptEvaluation();
     }
+
 }
