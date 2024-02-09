@@ -14,4 +14,11 @@ import java.util.List;
 public class UserSolvedQuestionIdList {
     private Long userId;
     private List<Long> problemIdList;
+
+    public static UserSolvedQuestionIdList of (Long userId, List<Long> problemIdList) {
+        return UserSolvedQuestionIdList.builder()
+                .userId(userId)
+                .problemIdList(problemIdList)
+                .build();
+    }
 }
