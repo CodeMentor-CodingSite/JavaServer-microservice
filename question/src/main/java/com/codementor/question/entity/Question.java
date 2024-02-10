@@ -1,5 +1,6 @@
 package com.codementor.question.entity;
 
+import com.codementor.question.dto.request.QuestionInputRequest;
 import com.codementor.question.enums.QuestionDifficulty;
 import lombok.*;
 
@@ -54,4 +55,13 @@ public class Question {
 
     @OneToMany(mappedBy = "question")
     private List<PlanMap> planMaps;
+
+    public static Question from(QuestionInputRequest request) {
+        return Question.builder()
+                .title(request.getQuestionTitle())
+                .content(request.getQuestionContent())
+                .category(request.getQuestionCategory())
+                .difficulty(request.getQuestionDifficulty())
+                .build();
+    }
 }
