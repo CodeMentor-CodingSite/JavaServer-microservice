@@ -22,22 +22,7 @@ public class QuestionHelperService {
      * @return 유저가 시도한 문제 Id 리스트와 유저가 푼 문제 Id 리스트
      */
     public UserQuestionsStatus getUserQuestionsStatus(Long userId) {
-        System.out.println("userId: " + userId);
-        List<ExecuteUsercode> executeUsercodes = executeUsercodeRepository.findAllByUserId(userId);
-        Set<Long> attemptedQuestionIds = new HashSet<>();
-        Set<Long> solvedQuestionIds = new HashSet<>();
-
-        for (ExecuteUsercode executeUsercode : executeUsercodes) {
-            if (executeUsercode.getIsCorrect()) {
-                solvedQuestionIds.add(executeUsercode.getQuestionId());
-            } else {
-                attemptedQuestionIds.add(executeUsercode.getQuestionId());
-            }
-        }
-        return UserQuestionsStatus.builder()
-                .attmptedQuestions(new ArrayList<>(attemptedQuestionIds))
-                .solvedQuestions(new ArrayList<>(solvedQuestionIds))
-                .build();
+        return UserQuestionsStatus.from(executeUsercodeRepository.findAllByUserId(userId));
     }
 
     public List<Long> getCorrectUserQuestionIdList(Long userId) {
