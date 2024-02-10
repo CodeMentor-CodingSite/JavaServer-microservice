@@ -23,6 +23,7 @@ public class ExecutionHelperService {
     private final LanguageRepository languageRepository;
     private final QuestionLanguageRepository questionLanguageRepository;
     private final QuestionTestCaseRepository questionTestCaseRepository;
+    private final PlanRepository planRepository;
 
 
     public EvaluationDto createEvaluationDto(Long questionId, String userLanguage) {
@@ -192,5 +193,12 @@ public class ExecutionHelperService {
             }
         }
         return request;
+    }
+
+    public List<UserPlanDto> getUserPlan(List<Long> userPlanIds) {
+        return planRepository.findAllById(userPlanIds)
+                .stream()
+                .map(UserPlanDto::from)
+                .collect(Collectors.toList());
     }
 }
