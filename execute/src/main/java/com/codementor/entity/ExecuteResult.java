@@ -1,5 +1,6 @@
 package com.codementor.entity;
 
+import com.codementor.dto.evaluation.EvalQuestionTestCaseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,4 +32,12 @@ public class ExecuteResult {
 
     @Column(name = "testcase_result", columnDefinition = "TEXT")
     private String testcaseResult;
+
+    public static ExecuteResult from(EvalQuestionTestCaseDto dto, ExecuteUsercode executeUsercode) {
+        return ExecuteResult.builder()
+                .executeUsercode(executeUsercode)
+                .questionTestCaseId(dto.getTestCaseId())
+                .testcaseResult(dto.getTestCaseResult())
+                .build();
+    }
 }
