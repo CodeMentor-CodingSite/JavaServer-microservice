@@ -55,4 +55,9 @@ public class ExternalApiController {
     public List<UserSubmitHistoryResponse> getUserSubmitHistory(@RequestBody List<UserSubmitHistoryResponse> req) {
         return executionHelperService.getUserSubmitHistory(req);
     }
+
+    @PostMapping("/api/external/plan/get")
+    public List<UserPlanDto> getUserPlan(@RequestBody List<Long> userPlanIds) {
+        return executionHelperService.getUserPlan(userPlanIds);
+    }
 }
