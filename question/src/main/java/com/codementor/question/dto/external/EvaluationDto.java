@@ -1,5 +1,6 @@
 package com.codementor.question.dto.external;
 
+import com.codementor.question.entity.Question;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,4 +33,19 @@ public class EvaluationDto {
     private Long executeTime;
     private List<String> testCaseResults;
     private String gptEvaluation;
+
+    public static EvaluationDto from(Question question,
+                                     List<String> questionConstraints,
+                                     List<EvalTestCaseDto> testCaseDtoList,
+                                     String answerCheckContent){
+        return EvaluationDto.builder()
+                .questionId(question.getId())
+                .questionTitle(question.getTitle())
+                .questionContent(question.getContent())
+                .questionCategory(question.getCategory())
+                .questionConstraints(questionConstraints)
+                .testCaseDtoList(testCaseDtoList)
+                .answerCheckContent(answerCheckContent)
+                .build();
+    }
 }
