@@ -24,4 +24,11 @@ public class UserPlan {
 
     @Column(name = "plan_id", columnDefinition = "BIGINT")
     private Long planId;
+
+    public static UserPlan subscribe(User user, Long planId) {
+        return UserPlan.builder()
+                .user(user)
+                .planId(planId)
+                .build();
+    }
 }
