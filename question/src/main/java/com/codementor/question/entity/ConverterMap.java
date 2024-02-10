@@ -25,4 +25,11 @@ public class ConverterMap {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "question_test_case_detail_id")
     private QuestionTestCaseDetail questionTestCaseDetail;
+
+    public static ConverterMap from(QuestionTestCaseDetail questionTestCaseDetail, CodeExecConverter codeExecConverter){
+        return ConverterMap.builder()
+                .questionTestCaseDetail(questionTestCaseDetail)
+                .codeExecConverter(codeExecConverter)
+                .build();
+    }
 }
