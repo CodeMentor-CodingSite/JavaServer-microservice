@@ -1,10 +1,12 @@
 package com.codementor.question.dto.external;
 
+import com.codementor.question.entity.Question;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Data
@@ -34,10 +36,38 @@ public class UserSolvedRatioTotalDto {
         this.questionIdList = questionIdList;
     }
 
-    public UserSolvedRatioTotalDto addProblemSolvedCounts(Long easyProblemSolvedCount, Long mediumProblemSolvedCount, Long hardProblemSolvedCount) {
+    public UserSolvedRatioTotalDto updatedWith(Long easyProblemSolvedCount, Long mediumProblemSolvedCount, Long hardProblemSolvedCount) {
         this.easyProblemSolvedCount = easyProblemSolvedCount;
         this.mediumProblemSolvedCount = mediumProblemSolvedCount;
         this.hardProblemSolvedCount = hardProblemSolvedCount;
+        return this;
+    }
+
+    public UserSolvedRatioTotalDto updatedWith(UserSolvedRatioTotalDto req, List<Question> questionsList) {
+        var questionSolvedList = req.getQuestionIdList();
+        Long easyProblemTotalCount = 0L;
+        Long mediumProblemTotalCount = 0L;
+        Long hardProblemTotalCount = 0L;
+
+        for (Question question : questionsList) {
+            if (questionSolvedList.contains(question.getId())) {
+                switch (question.getDifficulty()) {
+                    case EASY:
+                        easyProblemTotalCount++;
+                        break;
+                    case MEDIUM:
+                        mediumProblemTotalCount++;
+                        break;
+                    case HARD:
+                        hardProblemTotalCount++;
+                        break;
+                }
+            }
+        }
+
+        this.easyProblemTotalCount = easyProblemTotalCount;
+        this.mediumProblemTotalCount = mediumProblemTotalCount;
+        this.hardProblemTotalCount = hardProblemTotalCount;
         return this;
     }
 }
