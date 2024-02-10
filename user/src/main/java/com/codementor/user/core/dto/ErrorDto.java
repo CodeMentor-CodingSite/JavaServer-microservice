@@ -1,4 +1,4 @@
-package com.codementor.user.dto.dto;
+package com.codementor.user.core.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
