@@ -52,26 +52,13 @@ public class QuestionService {
      * @return 페이지네이션된 문제 dto
      */
     public Page<QuestionDto> getPaginatedQuestionDtos(@RequestHeader("userId") Long userId, Pageable pageable){
-        String getUserQuestionsStatusUrl = executeUrl + "/api/external/question/get/user/status";
-        UserQuestionsStatus userQuestionsStatus = requestToServer.postDataToServer(getUserQuestionsStatusUrl, userId, UserQuestionsStatus.class);
-        System.out.println("userQuestionsStatus: " + userQuestionsStatus.toString());
-        HashSet<Long> userAttemptedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getAttmptedQuestions());
-        HashSet<Long> userSolvedQuestionIdsSet = new HashSet<>(userQuestionsStatus.getSolvedQuestions());
-
         Page<Question> questionPage = questionRepository.findAll(pageable);
-        List<QuestionDto> questionDtos = new ArrayList<>();
 
-        for (Question question : questionPage.getContent()) {
-            UserSolvedStatus userSolvedStatus = UserSolvedStatus.FIRST;
-            if (userSolvedQuestionIdsSet.contains(question.getId())) {
-                userSolvedStatus = UserSolvedStatus.SOLVED;
-            } else if (userAttemptedQuestionIdsSet.contains(question.getId())) {
-                userSolvedStatus = UserSolvedStatus.ATTEMPTED;
-            }
-            questionDtos.add(QuestionDto.from(question, userSolvedStatus));
-        }
+        var getUserQuestionsStatusUrl = executeUrl + "/api/external/question/get/user/status";
+        var userQuestionsStatus = requestToServer.postDataToServer(getUserQuestionsStatusUrl, userId, UserQuestionsStatus.class);
 
-        return new PageImpl<>(questionDtos, pageable, questionPage.getTotalElements());
+        System.out.println("userQuestionsStatus: " + userQuestionsStatus.toString());
+        return new PageImpl<>(QuestionDto.from(questionPage, userQuestionsStatus), pageable, questionPage.getTotalElements());
     }
 
     private UserQuestionsStatus getuserQuestionsStatus(String url, Long userId) {
@@ -90,8 +77,8 @@ public class QuestionService {
      * @return 문제 dto
      */
     public QuestionDetailDtoResponse getQuestionById(Long questionId) {
-        Question question = questionRepository.findById(questionId).orElseThrow(() -> new RuntimeException("Question not found"));
-        return QuestionMapper.toDto(question);
+        return QuestionMapper.toDto(questionRepository.findById(questionId).orElseThrow(
+                () -> new RuntimeException("Question not found")));
     }
 
     /**
@@ -101,9 +88,9 @@ public class QuestionService {
      * @return 초기 코드
      */
     public QuestionInitCodeResponse getQuestionInitialCode(Long questionId, String language) {
-        Question question = questionRepository.findById(questionId)
+        var question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
-        QuestionLanguage questionLanguage = question.getQuestionLanguages().stream()
+        var questionLanguage = question.getQuestionLanguages().stream()
                 .filter(ql -> ql.getLanguage()!= null && language.equals(ql.getLanguage().getType()))
                 .findFirst()
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
