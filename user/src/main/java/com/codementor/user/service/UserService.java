@@ -1,10 +1,11 @@
 package com.codementor.user.service;
 
 import com.codementor.user.config.JwtProvider;
+import com.codementor.user.core.exception.CodeMentorException;
+import com.codementor.user.core.exception.ErrorEnum;
 import com.codementor.user.dto.*;
 import com.codementor.user.entity.User;
 import com.codementor.user.entity.UserLike;
-import com.codementor.user.exception.UserErrorEnum;
 import com.codementor.user.exception.UserException;
 import com.codementor.user.repository.UserLikeRepository;
 import com.codementor.user.repository.UserRepository;
@@ -38,10 +39,10 @@ public class UserService {
     @Transactional
     public TokenDTO doLogin(UserLoginDTO userLoginDTO) {
         User responseUser = userRepository.findByEmail(userLoginDTO.getEmail())
-                .orElseThrow(() -> new UserException(UserErrorEnum.INVALID_LOGIN_EMAIL));
+                .orElseThrow(() -> new CodeMentorException(ErrorEnum.INVALID_LOGIN_EMAIL));
 
         if (!responseUser.isMatchPassword(userLoginDTO.getPassword(), passwordEncoder)) {
-            throw new UserException(UserErrorEnum.INVALID_LOGIN_PASSWORD);
+            throw new CodeMentorException(ErrorEnum.INVALID_LOGIN_PASSWORD);
         }
 
         return createAllToken(responseUser);
@@ -50,7 +51,7 @@ public class UserService {
     @Transactional
     public UserProfileDTO getUser(Long userId) {
         User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+                .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         return UserProfileDTO.builder()
                 .nickname(foundUser.getNickname())
@@ -65,7 +66,7 @@ public class UserService {
     @Transactional
     public TokenDTO reissueToken(Long id) {
         User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+                .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         return TokenDTO.builder()
                 .accessToken(createAccessToken(foundUser))
@@ -84,7 +85,7 @@ public class UserService {
     @Transactional
     public String updateUser(UserUpdateDTO userUpdateDTO, Long id) {
         User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+                .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         String nickname = userUpdateDTO.getNickname();
         checkExistedNickname(nickname);
@@ -99,7 +100,7 @@ public class UserService {
 
     public String toggleLike(Long questionId, Long userId) {
         User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorEnum.NOT_FOUND_USER_BY_USER_ID));
+                .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         Optional<UserLike> userLike = userLikeRepository.findOneByQuestionIdAndUserId(questionId, foundUser.getId());
 
@@ -127,12 +128,12 @@ public class UserService {
 
     private void checkExistedEmail(String email) {
         if (userRepository.existsByEmail(email))
-            throw new UserException(UserErrorEnum.EXIST_EMAIL);
+            throw new CodeMentorException(ErrorEnum.EXIST_EMAIL);
     }
 
     private void checkExistedNickname(String nickname) {
         if (userRepository.existsByNickname(nickname))
-            throw new UserException(UserErrorEnum.EXIST_NICKNAME);
+            throw new CodeMentorException(ErrorEnum.EXIST_NICKNAME);
     }
 
     private TokenDTO createAllToken(User user) {
