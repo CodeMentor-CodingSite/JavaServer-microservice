@@ -25,7 +25,6 @@ public class UserCodeExecuteRequestConsumer {
     private final UserCodeExecuteResponseProducer userCodeExecuteResponseProducer;
 
     private static final String TOPIC_NAME = "usercode.request.topic.v1";
-
     private static final String GROUP_ID = "usercode.request.group.v1";
 
     private final ObjectMapper objectMapper = new ObjectMapper()
@@ -60,21 +59,11 @@ public class UserCodeExecuteRequestConsumer {
      */
     @Async
     protected void sendToKafkaWithExecutionResults(EvaluationDto evaluationDto){
-        long startTime = System.nanoTime();
-        // 코드 실행에 대한 결과 값들이 담긴 배열
-        ArrayList<String> executionResults = evaluationService.processExecutionResults(evaluationDto);
-        Long durationInMillis = (System.nanoTime() - startTime) / 1000000;
-        // 코드 실행에 대한 결과 값들을 기존 EvaluationDto에 담음
-        for (int i = 0; i < executionResults.size(); i++) {
-            evaluationDto.getTestCaseDtoList().get(i).setTestCaseResult(executionResults.get(i));
-        }
-
-        evaluationDto.setTestCaseResults(executionResults);
-        evaluationDto.setExecuteTime(durationInMillis);
-        // Kafka 에 결과값 전송
-        userCodeExecuteResponseProducer.sendToKafka(evaluationDto);
+        long startTime = System.nanoTime(); // 실행시간 측정
+        ArrayList<String> executionResults = evaluationService.processExecutionResults(evaluationDto); // 코드 실행에 대한 결과 값들이 담긴 배열
+        long durationInMillis = (System.nanoTime() - startTime) / 1000000; //실행 시간 측정
+        userCodeExecuteResponseProducer.sendToKafka(evaluationDto.updatedWith(executionResults, durationInMillis)); // Kafka 에 결과값 전송
     }
-
     /**
      * 비동기통신으로 Gpt 서버의 평가 결과를 Kafka 에 전송
      * @param evaluationDto Kafka 에서 받은 EvaluationDto 객체
@@ -82,11 +71,8 @@ public class UserCodeExecuteRequestConsumer {
      */
     @Async
     protected void sendToKafkaWithGptEvaluation(EvaluationDto evaluationDto) throws Exception {
-        // Gpt 서버의 평가 결과
-        String evaluationResult = chatService.gptUserCodeEvaluation(evaluationDto);
-        // Gpt 서버의 평가 결과를 기존 EvaluationDto에 담음
-        evaluationDto.setGptEvaluation(evaluationResult);
-        // Kafka 에 결과값 전송
-        userCodeExecuteResponseProducer.sendToKafka(evaluationDto);
+        String evaluationResult = chatService.gptUserCodeEvaluation(evaluationDto); // Gpt 서버의 평가 결과
+        evaluationDto.setGptEvaluation(evaluationResult); // Gpt 서버의 평가 결과를 기존 EvaluationDto에 담음
+        userCodeExecuteResponseProducer.sendToKafka(evaluationDto); // Kafka 에 결과값 전송
     }
 }
