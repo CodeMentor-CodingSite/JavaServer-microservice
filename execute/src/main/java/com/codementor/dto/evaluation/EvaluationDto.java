@@ -34,11 +34,12 @@ public class EvaluationDto {
     private List<String> testCaseResults;
     private String gptEvaluation;
 
-    public void updateWith(UserCodeExecutionRequest userCodeExecutionRequest, Long executeUserCodeId) {
+    public EvaluationDto updatedWith(UserCodeExecutionRequest userCodeExecutionRequest, Long executeUserCodeId) {
         this.userId = userCodeExecutionRequest.getUserId();
         this.userLanguage = userCodeExecutionRequest.getUserLanguage();
         this.userCode = userCodeExecutionRequest.getUserCode();
         this.executeUserCodeId = executeUserCodeId;
+        return this;
     }
 
 
