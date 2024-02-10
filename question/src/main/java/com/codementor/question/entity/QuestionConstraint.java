@@ -24,4 +24,11 @@ public class QuestionConstraint {
 
     @Column(name = "question_constraint_content", columnDefinition = "VARCHAR(50)")
     private String content;
+
+    public static QuestionConstraint from(Question savedQuestion, String content) {
+        return QuestionConstraint.builder()
+                .question(savedQuestion)
+                .content(content)
+                .build();
+    }
 }
