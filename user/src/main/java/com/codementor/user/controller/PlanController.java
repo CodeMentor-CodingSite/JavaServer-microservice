@@ -4,7 +4,6 @@ import com.codementor.user.core.dto.ResponseDto;
 import com.codementor.user.dto.external.UserPlanDto;
 import com.codementor.user.service.PlanService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class PlanController {
 
     @PutMapping("/subscribe/{planId}")
     public ResponseDto<String> subscribePlan(@RequestHeader("userId") Long userId, @PathVariable Long planId) {
-        return ResponseDto.ok(planService.subscribePlan(userId, planId));
+        return ResponseDto.ok(planService.toggleSubscribePlan(userId, planId));
     }
 
     @GetMapping("/plan")
