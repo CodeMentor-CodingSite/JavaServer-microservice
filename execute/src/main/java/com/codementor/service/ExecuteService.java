@@ -34,15 +34,7 @@ public class ExecuteService {
      * @return 유저가 푼 문제 수와 제출한 문제 수
      */
     public UserSolvedRatioSubmitDto getUserSolvedRatioSubmit(Long userId) {
-        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
-
-        Long userSolved = executeUsercodeList.stream().filter(ExecuteUsercode::getIsCorrect).count();
-        Long userSubmitted = (long) executeUsercodeList.size();
-
-        return UserSolvedRatioSubmitDto.builder()
-                .userProblemSolvedCount(userSolved)
-                .userProblemSubmittedCount(userSubmitted)
-                .build();
+        return UserSolvedRatioSubmitDto.from(executeUsercodeRepository.findAllByUserId(userId));
     }
 
     /**
@@ -57,20 +49,15 @@ public class ExecuteService {
      */
     public UserSolvedRatioTotalDto getUserSolvedRatioTotal(Long userId) {
         List<Long> correctQuestionIdList = getSolvedExecuteUserCodeList(userId); // 1.
+        var sendDto = UserSolvedRatioTotalDto.from(userId, correctQuestionIdList); // 2.
 
-        UserSolvedRatioTotalDto sendDto = UserSolvedRatioTotalDto.builder() // 2.
-                .userId(userId)
-                .questionIdList(correctQuestionIdList)
-                .build();
         String userSolvedCountsUrl = questionUrl + "/api/external/getUserSolvedCounts";
         UserSolvedRatioTotalDto userSolvedRatioTotalDto = requestToServer.postDataToServer(userSolvedCountsUrl, sendDto, UserSolvedRatioTotalDto.class);
 
         String questionDifficultyCountsUrl = questionUrl + "/api/external/getQuestionsDifficultyCounts"; // 3.
         QuestionDifficultyCounts questionDifficultyCounts = requestToServer.postDataToServer(questionDifficultyCountsUrl, null, QuestionDifficultyCounts.class);
 
-        userSolvedRatioTotalDto.updateProblemCountWith(questionDifficultyCounts); // 4.
-
-        return userSolvedRatioTotalDto;
+        return userSolvedRatioTotalDto.updatedProblemCountWith(questionDifficultyCounts); // 4.
     }
 
     /**
@@ -110,10 +97,10 @@ public class ExecuteService {
      * @param page 페이지
      * @param size 사이즈
      * @param difficulty 난이도
-     * @return
+     * @return Page 유저가 푼 문제에 대한 Id, 제목, 시간
      */
-    public Page<UserSolvedQuestionIdAndTitleAndTimeResponse> userSolvedQuestionIdAndTitleAndTime(
-            Long userId, int page, int size, String difficulty) {
+    public Page<UserSolvedQuestionIdAndTitleAndTimeResponse> userSolvedQuestionIdAndTitleAndTime(Long userId, int page, int size, String difficulty) {
+        Pageable pageableWithSort = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timeStamp"));
         List<UserSolvedQuestionIdAndTitleAndTimeResponse> responseList = new ArrayList<>();
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserIdAndIsCorrect(userId, true);
         for (var executeUsercode : executeUsercodeList){
@@ -126,7 +113,6 @@ public class ExecuteService {
                 responseList,
                 List.class);
 
-        Pageable pageableWithSort = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timeStamp"));
         return new PageImpl<>(finalResponse, pageableWithSort, finalResponse.size());
     }
 
