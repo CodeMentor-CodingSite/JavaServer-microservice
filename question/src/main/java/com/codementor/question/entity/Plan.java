@@ -1,5 +1,6 @@
 package com.codementor.question.entity;
 
+import com.codementor.question.dto.request.PlanInputRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,4 +27,11 @@ public class Plan {
 
     @OneToMany(mappedBy = "plan")
     private List<PlanMap> planMaps;
+
+    public static Plan from(PlanInputRequest request) {
+        return Plan.builder()
+                .planName(request.getName())
+                .planDescription(request.getExplanation())
+                .build();
+    }
 }
