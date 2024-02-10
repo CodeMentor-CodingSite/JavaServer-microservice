@@ -39,30 +39,13 @@ public class UserCodeExecutionRequestProducer {
      */
     @Transactional
     public void sendUserCodeExecutionRequestToKafka(UserCodeExecutionRequest userCodeExecutionRequest) {
-        EvalQuestionRequest evalQuestionRequest = EvalQuestionRequest.builder() // 1.
-                .questionId(userCodeExecutionRequest.getQuestionId())
-                .userLanguage(userCodeExecutionRequest.getUserLanguage())
-                .build();
-
-//        System.out.println(evalQuestionRequest.toString());
-        String questionDataFromQuestionServerUrl = questionUrl + "/api/external/execute";
-        EvaluationDto evaluationDto = requestToServer.postDataToServer(
+        var questionDataFromQuestionServerUrl = questionUrl + "/api/external/execute";
+        var evaluationDto = requestToServer.postDataToServer(
                 questionDataFromQuestionServerUrl,
-                evalQuestionRequest,
+                EvalQuestionRequest.from(userCodeExecutionRequest), // 1.
                 EvaluationDto.class);
-
-        ExecuteUsercode executeUsercode = ExecuteUsercode.builder() // 2.
-                .userId(userCodeExecutionRequest.getUserId())
-                .questionId(evaluationDto.getQuestionId())
-                .userLanguage(userCodeExecutionRequest.getUserLanguage())
-                .userCode(userCodeExecutionRequest.getUserCode())
-                .isCorrect(false)
-                .build();
-        Long executeUsercodeId = executeUsercodeRepository.save(executeUsercode).getId();
-
-        evaluationDto.updateWith(userCodeExecutionRequest, executeUsercodeId); // 3.
-
+        var executeUsercodeId = executeUsercodeRepository.save(ExecuteUsercode.from(userCodeExecutionRequest, evaluationDto)).getId(); // 2
         System.out.println("Sending to Kafka");
-        sendToKafka.sendData(TOPIC_NAME, evaluationDto); // 4.
+        sendToKafka.sendData(TOPIC_NAME, evaluationDto.updatedWith(userCodeExecutionRequest, executeUsercodeId)); // 3, 4.
     }
 }
