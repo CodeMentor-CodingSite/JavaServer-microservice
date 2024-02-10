@@ -42,11 +42,8 @@ public class EvaluationService {
      * @return
      */
     public ArrayList<String> processExecutionResults(EvaluationDto evaluationDto) {
-        // 코드 실행에 대한 결과 값들을 답는 배열
-        ArrayList<String> executionResults = new ArrayList<>();
-
-        // 최종 코드 완성 배열
-        ArrayList<String> executionPrompts = new ArrayList<>();
+        ArrayList<String> executionResults = new ArrayList<>(); // 코드 실행에 대한 결과 값들을 답는 배열
+        ArrayList<String> executionPrompts = new ArrayList<>(); // 최종 코드 완성 배열
 
         // 코드 실행을 위한 커멘트 프롬프트를 생성 ( java / python 구분 )
         if (evaluationDto.getUserLanguage().equals("Python")) {
@@ -62,7 +59,6 @@ public class EvaluationService {
             System.out.println(executionResult);
             executionResults.add(executionResult);
         }
-
         return executionResults;
     }
 
@@ -71,7 +67,6 @@ public class EvaluationService {
 
         // UserCode 관련
         String userCode = evaluationDto.getUserCode();
-
 
         // TestCase 관련
         List<EvalQuestionTestCaseDto> questionTestCaseDtoList = evaluationDto.getTestCaseDtoList();
@@ -170,15 +165,12 @@ public class EvaluationService {
         return prompts;
     }
 
-    // Todo : 코드 실행 서버와 연결하고, 결과값 받아오기
     private String sendRequestToExecuteServer(String codeExecutionStringCommand) {
-
-//         send request to execute server
+        // send request to execute server
         if (session == null || !session.isConnected()) {
             sshSessionOpen();
         }
-//         Execute command
-
+        // Execute command
         return executeCode(codeExecutionStringCommand);
     }
 
