@@ -76,4 +76,13 @@ public class EvaluationDto {
                 ", gptEvaluation='" + gptEvaluation + '\'' +'\n' +
                 '}';
     }
+
+    public EvaluationDto updatedWith(ArrayList<String> executionResults, Long durationInMillis){
+        for (int i = 0; i < executionResults.size(); i++) {
+            testCaseDtoList.get(i).setTestCaseResult(executionResults.get(i));
+        }
+        this.setTestCaseResults(executionResults);
+        this.setExecuteTime(durationInMillis);
+        return this;
+    }
 }
