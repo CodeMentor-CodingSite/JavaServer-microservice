@@ -6,7 +6,6 @@ import com.codementor.user.core.exception.ErrorEnum;
 import com.codementor.user.dto.*;
 import com.codementor.user.entity.User;
 import com.codementor.user.entity.UserLike;
-import com.codementor.user.exception.UserException;
 import com.codementor.user.repository.UserLikeRepository;
 import com.codementor.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
