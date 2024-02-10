@@ -34,28 +34,13 @@ public class UserCodeExecutionResponseConsumer {
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         if (evaluationDto.getGptEvaluation() == null){
             executeUsercode.updateWithIsCorrectAndExecuteTimeWith(evaluationDto); // 1.
-            saveExecuteResultForEachTestCases(evaluationDto, executeUsercode);
+            for (EvalQuestionTestCaseDto evalQuestionTestCaseDto : evaluationDto.getTestCaseDtoList()) {
+                executeResultRepository.save(ExecuteResult.from(evalQuestionTestCaseDto, executeUsercode)); // 테이블에 각 테스트케이스에 대한 결과를 저장한다.
+            }
             sseConnectionService.sendToUser(evaluationDto.getUserId().toString(), executeUsercode.getId()); // 2.
         } else {
             executeUsercode.updateWithGptEvaluationWith(evaluationDto); // 3.
         }
         executeUsercodeRepository.save(executeUsercode);
     }
-
-    /**
-     * execute_result 테이블에 각 테스트케이스에 대한 결과를 저장한다.
-     * @param evaluationDto kafka 메시지로부터 받은 EvaluationDto
-     * @param executeUsercode 기존 결과가 저장되어있지 않은 execute_usercode 엔터티
-     */
-    private void saveExecuteResultForEachTestCases(EvaluationDto evaluationDto, ExecuteUsercode executeUsercode) {
-        for (EvalQuestionTestCaseDto evalQuestionTestCaseDto : evaluationDto.getTestCaseDtoList()) {
-            ExecuteResult executeResult = ExecuteResult.builder()
-                    .executeUsercode(executeUsercode)
-                    .questionTestCaseId(evalQuestionTestCaseDto.getTestCaseId())
-                    .testcaseResult(evalQuestionTestCaseDto.getTestCaseResult())
-                    .build();
-            executeResultRepository.save(executeResult);
-        }
-    }
-
 }
