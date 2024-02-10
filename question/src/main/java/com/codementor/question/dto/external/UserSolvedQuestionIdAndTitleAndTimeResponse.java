@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Data
 @NoArgsConstructor
@@ -23,6 +24,18 @@ public class UserSolvedQuestionIdAndTitleAndTimeResponse {
     public void updateWith(Question question){
         this.questionTitle = question.getTitle();
         this.difficulty = question.getDifficulty().name();
+    }
+
+    public static UserSolvedQuestionIdAndTitleAndTimeResponse of(
+            UserSolvedQuestionIdAndTitleAndTimeResponse req,
+            Optional<Question> question){
+        return UserSolvedQuestionIdAndTitleAndTimeResponse.builder()
+                .usercodeId(req.getUsercodeId())
+                .questionId(question.get().getId())
+                .questionTitle(question.get().getTitle())
+                .difficulty(req.getDifficulty())
+                .timeStamp(req.getTimeStamp())
+                .build();
     }
 }
 
