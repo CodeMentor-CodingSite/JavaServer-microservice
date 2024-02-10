@@ -26,11 +26,12 @@ public class UserInfoService {
     private final QuestionRepository questionRepository;
 
     public Map<String, Long> getQuestionInfoByQuestionIdList(Long userId) {
-        List<Long> correctUserQuestionIdList = correctUserQuestionIdList(userId);
+        String url = executeUrl + "/api/external/correct-user-question-id-list";
+        List<Long> correctUserQuestionIdList = requestToServer.postDataToServer(url, userId, ArrayList.class);
+
         Map<String, Long> questionCountByTag = new HashMap<>();
-        for (Number questionId : correctUserQuestionIdList) {
-            Long longQuestionId = questionId.longValue();
-            Question question = questionRepository.findById(longQuestionId).orElse(null);
+        for (var questionId : correctUserQuestionIdList) {
+            Question question = questionRepository.findById(questionId).orElse(null);
             if (question != null) {
                 String category = question.getCategory();
                 questionCountByTag.put(category, questionCountByTag.getOrDefault(category, 0L) + 1);
@@ -39,10 +40,4 @@ public class UserInfoService {
         return questionCountByTag;
     }
 
-    private List<Long> correctUserQuestionIdList(Long userId) {
-        return requestToServer.postDataToServer(
-                executeUrl + "/api/external/correct-user-question-id-list",
-                userId,
-                ArrayList.class);
-    }
 }
