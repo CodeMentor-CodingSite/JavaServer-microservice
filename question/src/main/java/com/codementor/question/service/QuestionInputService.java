@@ -65,8 +65,7 @@ public class QuestionInputService {
 
             ArrayList<Long> converterIds = testCaseRequest.getTestCaseDetailDTOs().get(i).getConverterIds();
 
-            // 각 TestCaseDetailId와 ConverterId를 ConverterMap에 저장
-            for (Long converterId : converterIds) {
+            for (Long converterId : converterIds) { // // 각 TestCaseDetailId와 ConverterId를 ConverterMap에 저장
                 converterMapRepository.save(ConverterMap.from(questionTestCaseDetail, codeExecConverterRepository.findById(converterId).orElseThrow()));
             }
         }
@@ -80,7 +79,7 @@ public class QuestionInputService {
      */
     @Transactional
     public Long converterInput(ConverterInputRequest converterInputRequest) {
-        Language languageEntity = languageRepository.findByType(converterInputRequest.getLanguageType()).orElseThrow();
+        var languageEntity = languageRepository.findByType(converterInputRequest.getLanguageType()).orElseThrow();
         return codeExecConverterRepository.save(CodeExecConverter.from(languageEntity, converterInputRequest)).getId();
     }
 
@@ -91,17 +90,16 @@ public class QuestionInputService {
      */
     @Transactional
     public Long questionCodeInput(QuestionCodeInputRequest questionCodeInputRequest) {
-        Question question = questionRepository.findById(questionCodeInputRequest.getQuestionId()).orElseThrow(
+        var question = questionRepository.findById(questionCodeInputRequest.getQuestionId()).orElseThrow(
                 () -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
-        Language language = languageRepository.findByType(questionCodeInputRequest.getLanguageType()).orElseThrow(
+        var language = languageRepository.findByType(questionCodeInputRequest.getLanguageType()).orElseThrow(
                 () -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
 
         Optional<QuestionLanguage> foundQuestionLanguage = questionLanguageRepository.findByQuestionAndLanguage(question, language);
         if (foundQuestionLanguage.isPresent()) {
             throw new CodeMentorException(ErrorEnum.RECORD_ALREADY_EXISTS);
         }
-        var questionLanguage = QuestionLanguage.from(question, language, questionCodeInputRequest);
-        return questionLanguageRepository.save(questionLanguage).getId();
+        return questionLanguageRepository.save(QuestionLanguage.from(question, language, questionCodeInputRequest)).getId();
     }
 
 }
