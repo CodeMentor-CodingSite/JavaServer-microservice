@@ -24,20 +24,17 @@ public class UserSolvedRatioTotalDto {
 
     private List<Long> questionIdList;
 
-    public UserSolvedRatioTotalDto(Long userId, List<Long> questionIdList) {
-        this.userId = userId;
-        this.easyProblemSolvedCount = 0L;
-        this.easyProblemTotalCount = 0L;
-        this.mediumProblemSolvedCount = 0L;
-        this.mediumProblemTotalCount = 0L;
-        this.hardProblemSolvedCount = 0L;
-        this.hardProblemTotalCount = 0L;
-        this.questionIdList = questionIdList;
+    public static UserSolvedRatioTotalDto from(Long userId, List<Long> correctQuestionIdList) {
+        return UserSolvedRatioTotalDto.builder()
+                .userId(userId)
+                .questionIdList(correctQuestionIdList)
+                .build();
     }
 
-    public void updateProblemCountWith(QuestionDifficultyCounts questionDifficultyCounts){
+    public UserSolvedRatioTotalDto updatedProblemCountWith(QuestionDifficultyCounts questionDifficultyCounts){
         this.easyProblemSolvedCount = questionDifficultyCounts.getEasyProblemsCount();
         this.mediumProblemSolvedCount = questionDifficultyCounts.getMediumProblemsCount();
         this.hardProblemSolvedCount = questionDifficultyCounts.getHardProblemsCount();
+        return this;
     }
 }
