@@ -1,6 +1,6 @@
 package com.codementor.user.core.exception;
 
-import com.codementor.user.dto.dto.ErrorDto;
+import com.codementor.user.core.dto.ErrorDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
