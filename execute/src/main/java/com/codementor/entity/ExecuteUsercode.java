@@ -2,6 +2,7 @@ package com.codementor.entity;
 
 import com.codementor.dto.evaluation.EvalQuestionTestCaseDto;
 import com.codementor.dto.evaluation.EvaluationDto;
+import com.codementor.dto.request.UserCodeExecutionRequest;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -65,6 +66,16 @@ public class ExecuteUsercode {
 
     public void updateWithGptEvaluationWith(EvaluationDto evaluationDto) {
         this.gptEvaluation = evaluationDto.getGptEvaluation();
+    }
+
+    public static ExecuteUsercode from(UserCodeExecutionRequest request, EvaluationDto dto){
+        return ExecuteUsercode.builder()
+                .userId(request.getUserId())
+                .questionId(dto.getQuestionId())
+                .userLanguage(request.getUserLanguage())
+                .userCode(request.getUserCode())
+                .isCorrect(false)
+                .build();
     }
 
 }
