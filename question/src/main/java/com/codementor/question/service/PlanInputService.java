@@ -20,11 +20,7 @@ public class PlanInputService {
     private final QuestionRepository questionRepository;
 
     public Long planInput(PlanInputRequest request) {
-        Plan plan = Plan.builder()
-                .planName(request.getName())
-                .planDescription(request.getExplanation())
-                .build();
-        planRepository.save(plan);
+        var plan = planRepository.save(Plan.from(request));
         List<PlanMap> planMaps = request.getQuestionIds().stream()
                 .map(questionId -> PlanMap.builder()
                         .plan(plan)
