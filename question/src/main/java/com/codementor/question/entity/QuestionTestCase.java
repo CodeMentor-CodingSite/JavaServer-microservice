@@ -1,5 +1,6 @@
 package com.codementor.question.entity;
 
+import com.codementor.question.dto.request.TestCaseRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,4 +32,12 @@ public class QuestionTestCase {
 
     @OneToMany(mappedBy = "questionTestCase")
     private List<QuestionTestCaseDetail> questionTestCaseDetails;
+
+    public static QuestionTestCase from(Question question, TestCaseRequest testcaseRequest){
+        return QuestionTestCase.builder()
+                .question(question)
+                .isExample(testcaseRequest.getIsExample())
+                .explanation(testcaseRequest.getExplanation())
+                .build();
+    }
 }
