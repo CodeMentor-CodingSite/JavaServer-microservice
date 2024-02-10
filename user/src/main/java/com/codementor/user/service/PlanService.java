@@ -25,15 +25,15 @@ public class PlanService {
     private final UserPlanRepository userPlanRepository;
     private final UserRepository userRepository;
 
-    public String subscribePlan(Long userId, Long planId){
+    public String toggleSubscribePlan(Long userId, Long planId){
         var userPlan = userPlanRepository.findByUserIdAndPlanId(userId, planId);
-        if(userPlan.isPresent()){
-            userPlanRepository.deleteById(userPlan.get().getId());
-            return "Unsubscribed successfully";
-        } else {
+        if(userPlan.isEmpty()){
             User user = userRepository.findById(userId).orElseThrow();
             userPlanRepository.save(UserPlan.subscribe(user, planId));
             return "Subscribed successfully";
+        } else {
+            userPlanRepository.deleteById(userPlan.get().getId());
+            return "Unsubscribed successfully";
         }
     }
 
