@@ -1,5 +1,6 @@
 package com.codementor.question.entity;
 
+import com.codementor.question.dto.request.QuestionCodeInputRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,4 +32,16 @@ public class QuestionLanguage {
 
     @Column(name = "answer_check_content", columnDefinition = "TEXT")
     private String checkContent;
+
+    public static QuestionLanguage from(Question question, Language language, QuestionCodeInputRequest questionCodeInputRequest) {
+        return QuestionLanguage.builder()
+                .question(question)
+                .language(language)
+                .initContent(questionCodeInputRequest.getQuestionInitContent())
+                .checkContent(questionCodeInputRequest.getAnswerCheckContent())
+                .build();
+    }
+                .checkContent(checkContent)
+                .build();
+    }
 }
