@@ -38,22 +38,10 @@ public class QuestionInputService {
      */
     @Transactional
     public Long questionInput(QuestionInputRequest request) {
-        Question question = Question.builder()
-                .title(request.getQuestionTitle())
-                .content(request.getQuestionContent())
-                .category(request.getQuestionCategory())
-                .difficulty(request.getQuestionDifficulty())
-                .build();
-        Question savedQuestion = questionRepository.save(question);
-
+        Question savedQuestion = questionRepository.save(Question.from(request));
         for (int i = 0; i < request.getQuestionConstraintContents().size(); i++) {
-            QuestionConstraint questionConstraint = QuestionConstraint.builder()
-                    .question(savedQuestion)
-                    .content(request.getQuestionConstraintContents().get(i))
-                    .build();
-            questionConstraintRepository.save(questionConstraint);
+            questionConstraintRepository.save(QuestionConstraint.from(savedQuestion, request.getQuestionConstraintContents().get(i)));
         }
-
         return savedQuestion.getId();
     }
 
@@ -64,37 +52,24 @@ public class QuestionInputService {
      */
     @Transactional
     public Long testCaseInput(TestCaseRequest testCaseRequest) {
-        Question question = questionRepository.findById((long) testCaseRequest.getQuestionId()).orElseThrow();
-
-        QuestionTestCase questionTestCase = QuestionTestCase.builder()
-                .question(question)
-                .isExample(testCaseRequest.getIsExample())
-                .explanation(testCaseRequest.getExplanation())
-                .build();
-        QuestionTestCase savedQuestionTestCase = questionTestCaseRepository.save(questionTestCase);
+        var question = questionRepository.findById((long) testCaseRequest.getQuestionId()).orElseThrow();
+        var savedQuestionTestCase = questionTestCaseRepository.save(QuestionTestCase.from(question, testCaseRequest));
 
         // 각 TestCaseDetail에 ConverterMap 저장
         for (int i = 0; i < testCaseRequest.getTestCaseDetailDTOs().size(); i++) {
-            QuestionTestCaseDetail questionTestCaseDetail = QuestionTestCaseDetail.builder()
-                    .questionTestCase(savedQuestionTestCase)
-                    .key(testCaseRequest.getTestCaseDetailDTOs().get(i).getTestCaseKey())
-                    .value(testCaseRequest.getTestCaseDetailDTOs().get(i).getTestCaseValue())
-                    .build();
+            var questionTestCaseDetail = QuestionTestCaseDetail.from(
+                    savedQuestionTestCase,
+                    testCaseRequest.getTestCaseDetailDTOs().get(i).getTestCaseKey(),
+                    testCaseRequest.getTestCaseDetailDTOs().get(i).getTestCaseValue());
             questionTestCaseDetailRepository.save(questionTestCaseDetail);
 
             ArrayList<Long> converterIds = testCaseRequest.getTestCaseDetailDTOs().get(i).getConverterIds();
 
             // 각 TestCaseDetailId와 ConverterId를 ConverterMap에 저장
             for (Long converterId : converterIds) {
-                CodeExecConverter codeExecConverter = codeExecConverterRepository.findById(converterId).orElseThrow();
-                ConverterMap converterMap = ConverterMap.builder()
-                        .questionTestCaseDetail(questionTestCaseDetail)
-                        .codeExecConverter(codeExecConverter)
-                        .build();
-                converterMapRepository.save(converterMap);
+                converterMapRepository.save(ConverterMap.from(questionTestCaseDetail, codeExecConverterRepository.findById(converterId).orElseThrow()));
             }
         }
-
         return savedQuestionTestCase.getId();
     }
 
@@ -106,16 +81,7 @@ public class QuestionInputService {
     @Transactional
     public Long converterInput(ConverterInputRequest converterInputRequest) {
         Language languageEntity = languageRepository.findByType(converterInputRequest.getLanguageType()).orElseThrow();
-
-        CodeExecConverter codeExecConverter = CodeExecConverter.builder()
-                .language(languageEntity)
-                .content(converterInputRequest.getCodeExecConverterContent())
-                .returnType(converterInputRequest.getResultType())
-                .methodName(converterInputRequest.getMethodName())
-                .build();
-
-        CodeExecConverter savedCodeExecConverter = codeExecConverterRepository.save(codeExecConverter);
-        return savedCodeExecConverter.getId();
+        return codeExecConverterRepository.save(CodeExecConverter.from(languageEntity, converterInputRequest)).getId();
     }
 
     /**
@@ -125,25 +91,17 @@ public class QuestionInputService {
      */
     @Transactional
     public Long questionCodeInput(QuestionCodeInputRequest questionCodeInputRequest) {
-        Question question = questionRepository.findById(questionCodeInputRequest.getQuestionId())
-                .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
-        Language language = languageRepository.findByType(questionCodeInputRequest.getLanguageType())
-                .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
+        Question question = questionRepository.findById(questionCodeInputRequest.getQuestionId()).orElseThrow(
+                () -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
+        Language language = languageRepository.findByType(questionCodeInputRequest.getLanguageType()).orElseThrow(
+                () -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
+
         Optional<QuestionLanguage> foundQuestionLanguage = questionLanguageRepository.findByQuestionAndLanguage(question, language);
         if (foundQuestionLanguage.isPresent()) {
-            System.out.println("foundQuestionLanguage.get().getId() = " + foundQuestionLanguage.get().getId());
             throw new CodeMentorException(ErrorEnum.RECORD_ALREADY_EXISTS);
         }
-
-        QuestionLanguage questionLanguage = QuestionLanguage.builder()
-                .question(question)
-                .language(language)
-                .initContent(questionCodeInputRequest.getQuestionInitContent())
-                .checkContent(questionCodeInputRequest.getAnswerCheckContent())
-                .build();
-
-        QuestionLanguage response = questionLanguageRepository.save(questionLanguage);
-        return response.getId();
+        var questionLanguage = QuestionLanguage.from(question, language, questionCodeInputRequest);
+        return questionLanguageRepository.save(questionLanguage).getId();
     }
 
 }
