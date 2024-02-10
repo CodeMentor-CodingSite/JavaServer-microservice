@@ -1,5 +1,6 @@
 package com.codementor.question.entity;
 
+import com.codementor.question.dto.request.ConverterInputRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,4 +35,13 @@ public class CodeExecConverter {
 
     @OneToMany(mappedBy = "codeExecConverter")
     private List<ConverterMap> converterMaps;
+
+    public static CodeExecConverter from(Language languageEntity, ConverterInputRequest converterInputRequest) {
+        return CodeExecConverter.builder()
+                .language(languageEntity)
+                .content(converterInputRequest.getCodeExecConverterContent())
+                .returnType(converterInputRequest.getResultType())
+                .methodName(converterInputRequest.getMethodName())
+                .build();
+    }
 }
