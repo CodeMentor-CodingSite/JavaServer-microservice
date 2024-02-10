@@ -41,7 +41,4 @@ public class QuestionLanguage {
                 .checkContent(questionCodeInputRequest.getAnswerCheckContent())
                 .build();
     }
-                .checkContent(checkContent)
-                .build();
-    }
 }
