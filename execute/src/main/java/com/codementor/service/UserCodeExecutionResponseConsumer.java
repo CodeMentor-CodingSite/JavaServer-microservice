@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 public class UserCodeExecutionResponseConsumer {
-
     private final SseConnectionService sseConnectionService;
 
     private final ExecuteUsercodeRepository executeUsercodeRepository;
