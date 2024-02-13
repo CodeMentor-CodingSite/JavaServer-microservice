@@ -24,6 +24,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
+
     @Transactional
     public String createUser(UserCreateDTO userCreateDTO) {
         checkExistedUser(userCreateDTO);
