@@ -51,7 +51,7 @@ public class QuestionService {
      * @param pageable 페이지네이션 정보
      * @return 페이지네이션된 문제 dto
      */
-    public Page<QuestionDto> getPaginatedQuestionDtos(@RequestHeader("userId") Long userId, Pageable pageable){
+    public Page<QuestionDto> getPaginatedQuestionDtos(Long userId, Pageable pageable){
         Page<Question> questionPage = questionRepository.findAll(pageable);
 
         var getUserQuestionsStatusUrl = executeUrl + "/api/external/question/get/user/status";
