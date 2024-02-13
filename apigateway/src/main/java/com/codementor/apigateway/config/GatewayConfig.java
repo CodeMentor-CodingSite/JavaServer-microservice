@@ -30,7 +30,7 @@ public class GatewayConfig {
                         .filters(f -> f.filter(adminFilter.apply(new Object())))
                         .uri(userURI))
                 .route("user-user-service", r -> r
-                        .path("/api/user/check/user1", "/api/user/check/user2", "/api/user/users", "/api/user/reissue", "/api/user/likes/{questionId}")
+                        .path("/api/user/check/user1", "/api/user/check/user2", "/api/user/users", "/api/user/reissue", "/api/user/likes/**", "/api/user/subscribe/**", "/api/user/plan")
                         .filters(f -> f.filter(userFilter.apply(new Object())))
                         .uri(userURI))
                 .route("user-service", r -> r
