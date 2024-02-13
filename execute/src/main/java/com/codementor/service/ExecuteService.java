@@ -134,7 +134,7 @@ public class ExecuteService {
     }
 
     public ExecuteUsercodeDto usercodeHistory(Long userId, Long usercodeId) {
-        return ExecuteUsercodeDto.from(executeUsercodeRepository.findByIdAndUsercodeId(userId, usercodeId));
+        return ExecuteUsercodeDto.from(executeUsercodeRepository.findByIdAndUserId(userId, usercodeId));
     }
 
     public List<ExecuteUsercodeDto> allUsercodeHistory(Long userId, Long questionId) {
