@@ -25,7 +25,7 @@ public class ExecuteUsercodeController {
      * @return SseEmitter
      */
     @PostMapping("/api/openSseConnection")
-    public SseEmitter subscribe(@RequestHeader("userId") Long userId){
+    public SseEmitter subscribe(@RequestHeader("id") Long userId){
         return sseConnectionService.createEmitterForUsers(userId);
     }
 
@@ -36,7 +36,7 @@ public class ExecuteUsercodeController {
      * @return 성공 메시지
      */
     @PostMapping("/api/execute/userCode")
-    public ResponseDto evaluateUserCode(@RequestHeader("userId") Long userId,
+    public ResponseDto evaluateUserCode(@RequestHeader("id") Long userId,
                                         @RequestBody UserCodeExecutionRequest userCodeExecutionRequest) {
         userId = 1L; //Todo : remove this line
         userCodeExecutionRequest.setUserId(userId);

@@ -21,17 +21,16 @@ public class QuestionController {
     public Page<QuestionDto> getQuestionList(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
-            Long userId) {
+            @RequestHeader("id") Long userId) {
         return questionService.getPaginatedQuestionDtos(userId, PageRequest.of(page, size));
     }
 
-    @GetMapping("/question/{questionId}")
-    public ResponseDto<QuestionDetailDtoResponse> getQuestionDetail(@PathVariable Long questionId,
-                                                                    @RequestParam(value = "userId") Long userId) {
+    @GetMapping("/questions/{questionId}")
+    public ResponseDto<QuestionDetailDtoResponse> getQuestionDetail(@PathVariable Long questionId) {
         return ResponseDto.ok( questionService.getQuestionById(questionId));
     }
 
-    @GetMapping("question/{questionId}/initial-code/{langauage}")
+    @GetMapping("/questions/{questionId}/languages/{language}")
     public ResponseDto<QuestionInitCodeResponse> getQuestionInitialCode(@PathVariable Long questionId, @PathVariable String language) {
         return ResponseDto.ok(questionService.getQuestionInitialCode(questionId, language));
     }

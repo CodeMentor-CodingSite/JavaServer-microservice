@@ -24,7 +24,7 @@ public class ExecuteController {
      * @return UserSolvedRatioSubmitDto
      */
     @GetMapping("/api/execute/problem/solved/ratio/submit")
-    public ResponseDto getUserProblemSolvedSubmitRatio(@RequestHeader("userId") Long userId){
+    public ResponseDto getUserProblemSolvedSubmitRatio(@RequestHeader("id") Long userId){
         return ResponseDto.ok(executeService.getUserSolvedRatioSubmit(userId));
     }
 
@@ -34,7 +34,7 @@ public class ExecuteController {
      * @return UserSolvedRatioSTotalDto
      */
     @GetMapping("/api/execute/problem/solved/ratio/total")
-    public ResponseDto getUserProblemSolvedTotalRatio(@RequestHeader("userId") Long userId){
+    public ResponseDto getUserProblemSolvedTotalRatio(@RequestHeader("id") Long userId){
         return ResponseDto.ok(executeService.getUserSolvedRatioTotal(userId));
     }
 
@@ -44,18 +44,18 @@ public class ExecuteController {
      * @return UserSolvedCategoryDtoList
      */
     @GetMapping("/api/execute/problem/solved/category")
-    public ResponseDto getUserSolvedQuestionCategory(@RequestHeader("userId") Long userId){
+    public ResponseDto getUserSolvedQuestionCategory(@RequestHeader("id") Long userId){
         return ResponseDto.ok(executeService.getUserSolvedQuestion(userId));
     }
 
     @GetMapping("/api/execute/problem/solved/language")
-    public ResponseDto<UserUsedLanguagesDtoList> getUserUsedLanguages(@RequestHeader("userId") Long userId) {
+    public ResponseDto<UserUsedLanguagesDtoList> getUserUsedLanguages(@RequestHeader("id") Long userId) {
         return ResponseDto.ok(executeService.getUserUsedLanguages(userId));
     }
 
     @GetMapping("/api/execute/problem/solved/difficulty/counts")
     public Page<UserSolvedQuestionIdAndTitleAndTimeResponse> getUserSolvedQuestionIdAndTitleAndTime(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("id") Long userId,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam("difficulty") String difficulty) {
@@ -64,19 +64,19 @@ public class ExecuteController {
 
     @GetMapping("/api/execute/problem/all")
     public Page<UserSubmitHistoryResponse> getUserSubmitHistory(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("id") Long userId,
             @RequestParam("page") int page,
             @RequestParam("size") int size) {
         return executeService.userSubmitHistory(userId, page, size);
     }
 
     @GetMapping("/api/execute/{usercodeId}")
-    public ResponseDto<ExecuteUsercodeDto> userCodeHistory(@RequestHeader("userId") Long userId, @PathVariable Long usercodeId) {
+    public ResponseDto<ExecuteUsercodeDto> userCodeHistory(@RequestHeader("id") Long userId, @PathVariable Long usercodeId) {
         return ResponseDto.ok(executeService.usercodeHistory(userId, usercodeId));
     }
 
     @GetMapping("/api/execute/all/{questionId}")
-    public ResponseDto<List<ExecuteUsercodeDto>> allUserCodeHistory(@RequestHeader("userId") Long userId, @PathVariable Long questionId) {
+    public ResponseDto<List<ExecuteUsercodeDto>> allUserCodeHistory(@RequestHeader("id") Long userId, @PathVariable Long questionId) {
         return ResponseDto.ok(executeService.allUsercodeHistory(userId, questionId));
     }
 }
