@@ -24,7 +24,7 @@ public class ExecuteUsercodeController {
      * @param userId 유저 아이디
      * @return SseEmitter
      */
-    @PostMapping("/api/openSseConnection")
+    @PostMapping("/api/execute/openSseConnection")
     public SseEmitter subscribe(@RequestHeader("id") Long userId){
         return sseConnectionService.createEmitterForUsers(userId);
     }
