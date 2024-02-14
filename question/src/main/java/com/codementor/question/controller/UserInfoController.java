@@ -14,7 +14,7 @@ public class UserInfoController {
 
     private final UserInfoService userInfoService;
 
-    @GetMapping("/api/questions/question-count-by-tag")
+    @GetMapping("/api/question/question-count-by-tag")
     public ResponseDto<Map<String, Long>> getQuestionCountByTag(@RequestHeader("id") Long userId) {
         return ResponseDto.ok(userInfoService.getQuestionInfoByQuestionIdList(userId));
     }
