@@ -44,6 +44,9 @@ public class GatewayConfig {
                         .filters(f -> f.filter(userFilter.apply(new Object())))
                         .uri(questionURI))
                 .route("execute-service", r -> r
+                        .path("/api/execute/{questionId}/history")
+                        .uri(executeURI))
+                .route("execute-user-service", r -> r
                         .path("/api/execute/**")
                         .filters(f -> f.filter(userFilter.apply(new Object())))
                         .uri(executeURI))
