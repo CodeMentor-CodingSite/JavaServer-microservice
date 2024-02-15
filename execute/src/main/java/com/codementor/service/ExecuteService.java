@@ -3,8 +3,8 @@ package com.codementor.service;
 import com.codementor.core.util.RequestToServer;
 import com.codementor.dto.*;
 import com.codementor.dto.external.QuestionDifficultyCounts;
-import com.codementor.dto.response.UserSolvedQuestionIdAndTitleAndTimeResponse;
 import com.codementor.dto.external.UserSolvedQuestionIdList;
+import com.codementor.dto.response.UserSolvedQuestionIdAndTitleAndTimeResponse;
 import com.codementor.dto.response.UserSubmitHistoryResponse;
 import com.codementor.entity.ExecuteUsercode;
 import com.codementor.repository.ExecuteUsercodeRepository;
@@ -93,9 +93,10 @@ public class ExecuteService {
 
     /**
      * 유저가 푼 문제에 대한 Id, 제목, 시간을 가져와서 페이징 처리하여 반환한다.
-     * @param userId 유저 아이디
-     * @param page 페이지
-     * @param size 사이즈
+     *
+     * @param userId     유저 아이디
+     * @param page       페이지
+     * @param size       사이즈
      * @param difficulty 난이도
      * @return Page 유저가 푼 문제에 대한 Id, 제목, 시간
      */
@@ -103,7 +104,7 @@ public class ExecuteService {
         Pageable pageableWithSort = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timeStamp"));
         List<UserSolvedQuestionIdAndTitleAndTimeResponse> responseList = new ArrayList<>();
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserIdAndIsCorrect(userId, true);
-        for (var executeUsercode : executeUsercodeList){
+        for (var executeUsercode : executeUsercodeList) {
             responseList.add(UserSolvedQuestionIdAndTitleAndTimeResponse.of(executeUsercode, difficulty));
         }
 
@@ -119,7 +120,7 @@ public class ExecuteService {
     public Page<UserSubmitHistoryResponse> userSubmitHistory(Long userId, int page, int size) {
         List<UserSubmitHistoryResponse> responseList = new ArrayList<>();
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
-        for (var executeUsercode : executeUsercodeList){
+        for (var executeUsercode : executeUsercodeList) {
             responseList.add(UserSubmitHistoryResponse.of(executeUsercode));
         }
 
@@ -143,6 +144,16 @@ public class ExecuteService {
                 .collect(Collectors.toList());
     }
 
+    public Page<ExecuteAllUsercodeDto> getAllHistory(Long questionId, int page, int size) {
+        List<ExecuteAllUsercodeDto> executeUsercodeDtos = executeUsercodeRepository.findAllByQuestionId(questionId).stream()
+                .map(ExecuteAllUsercodeDto::from)
+                .sorted(Comparator.comparing(ExecuteAllUsercodeDto::getTimeStamp).reversed())
+                .collect(Collectors.toList());
+
+        Pageable pageableWithSort = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timeStamp"));
+
+        return new PageImpl<>(executeUsercodeDtos, pageableWithSort, executeUsercodeDtos.size());
+    }
 
     //풀었던 문제 엔터티들의 Id를 가져온다.
     private List<Long> getSolvedExecuteUserCodeList(Long userId) {
