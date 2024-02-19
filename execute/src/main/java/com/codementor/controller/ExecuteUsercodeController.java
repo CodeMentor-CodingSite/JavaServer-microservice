@@ -5,10 +5,7 @@ import com.codementor.dto.request.UserCodeExecutionRequest;
 import com.codementor.service.SseConnectionService;
 import com.codementor.service.UserCodeExecutionRequestProducer;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
@@ -38,7 +35,6 @@ public class ExecuteUsercodeController {
     @PostMapping("/api/execute/userCode")
     public ResponseDto evaluateUserCode(@RequestHeader("id") Long userId,
                                         @RequestBody UserCodeExecutionRequest userCodeExecutionRequest) {
-        userId = 1L; //Todo : remove this line
         userCodeExecutionRequest.setUserId(userId);
         userCodeExecutionRequestProducer.sendUserCodeExecutionRequestToKafka(userCodeExecutionRequest);
         return ResponseDto.ok("user code sent to execution kafka topic");
