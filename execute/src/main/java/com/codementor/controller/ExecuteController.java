@@ -75,8 +75,9 @@ public class ExecuteController {
     }
 
     @GetMapping("/api/execute/{usercodeId}")
-    public ResponseDto<ExecuteUsercodeDto> userCodeHistory(@RequestHeader("id") Long userId, @PathVariable Long usercodeId) {
-        return ResponseDto.ok(executeService.usercodeHistory(userId, usercodeId));
+    public ResponseDto userCodeHistory(@RequestHeader("id") Long userId,
+                                                           @PathVariable Long usercodeId) {
+        return ResponseDto.ok(executeService.getUserSubmitHistory(userId, usercodeId));
     }
 
     @GetMapping("/api/execute/all/{questionId}")
