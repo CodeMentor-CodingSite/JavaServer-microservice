@@ -60,6 +60,8 @@ public class ExecuteService {
         return userSolvedRatioTotalDto.updatedProblemCountWith(questionDifficultyCounts); // 4.
     }
 
+
+
     /**
      * 유저가 푼 문제에 대한 카테고리와 난이도가 포함된 정보를 가져온다.
      *
@@ -117,6 +119,10 @@ public class ExecuteService {
         return new PageImpl<>(finalResponse, pageableWithSort, finalResponse.size());
     }
 
+    public UserSubmitHistoryResponse getUserSubmitHistory(Long userId, Long usercodeId) {
+        return UserSubmitHistoryResponse.of(executeUsercodeRepository.findByIdAndUserId(usercodeId, userId));
+    }
+
     public Page<UserSubmitHistoryResponse> userSubmitHistory(Long userId, int page, int size) {
         List<UserSubmitHistoryResponse> responseList = new ArrayList<>();
         List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
@@ -132,10 +138,6 @@ public class ExecuteService {
 
         Pageable pageableWithSort = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timeStamp"));
         return new PageImpl<>(finalResponse, pageableWithSort, finalResponse.size());
-    }
-
-    public ExecuteUsercodeDto usercodeHistory(Long userId, Long usercodeId) {
-        return ExecuteUsercodeDto.from(executeUsercodeRepository.findByIdAndUserId(usercodeId, userId));
     }
 
     public List<ExecuteUsercodeDto> allUsercodeHistory(Long userId, Long questionId) {
