@@ -22,7 +22,7 @@ public class QuestionConstraint {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @Column(name = "question_constraint_content", columnDefinition = "VARCHAR(50)")
+    @Column(name = "question_constraint_content", columnDefinition = "VARCHAR(300)")
     private String content;
 
     public static QuestionConstraint from(Question savedQuestion, String content) {
