@@ -8,26 +8,23 @@ import com.codementor.question.dto.response.QuestionDetailDtoResponse;
 import com.codementor.question.dto.QuestionDto;
 import com.codementor.question.dto.response.QuestionInitCodeResponse;
 import com.codementor.question.entity.Question;
-import com.codementor.question.entity.QuestionLanguage;
-import com.codementor.question.enums.UserSolvedStatus;
 import com.codementor.question.mapper.QuestionMapper;
 import com.codementor.question.repository.PlanMapRepository;
 import com.codementor.question.repository.PlanRepository;
 import com.codementor.question.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +48,8 @@ public class QuestionService {
      * @param pageable 페이지네이션 정보
      * @return 페이지네이션된 문제 dto
      */
+    @Transactional(readOnly = true)
+    @Cacheable(value = "question", key = "#userId + #pageable.pageNumber")
     public Page<QuestionDto> getPaginatedQuestionDtos(Long userId, Pageable pageable){
         Page<Question> questionPage = questionRepository.findAll(pageable);
 
@@ -76,6 +75,8 @@ public class QuestionService {
      * @param questionId 문제 아이디
      * @return 문제 dto
      */
+    @Transactional(readOnly = true)
+    @Cacheable(value = "question", key = "#questionId")
     public QuestionDetailDtoResponse getQuestionById(Long questionId) {
         return QuestionMapper.toDto(questionRepository.findById(questionId).orElseThrow(
                 () -> new RuntimeException("Question not found")));
@@ -87,6 +88,8 @@ public class QuestionService {
      * @param language 언어
      * @return 초기 코드
      */
+    @Transactional(readOnly = true)
+    @Cacheable(value = "question", key = "#questionId + #language")
     public QuestionInitCodeResponse getQuestionInitialCode(Long questionId, String language) {
         var question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
