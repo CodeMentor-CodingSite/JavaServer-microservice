@@ -1,4 +1,4 @@
-package com.codementor.question.repository;
+package com.codementor.question.repository.ConverterMap;
 
 
 import com.codementor.question.entity.ConverterMap;
@@ -8,5 +8,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ConverterMapRepository extends JpaRepository<ConverterMap, Long> {
-    List<ConverterMap> findAllByQuestionTestCaseDetail(QuestionTestCaseDetail questionTestCaseDetail);
 }

@@ -1,4 +1,4 @@
-package com.codementor.question.repository;
+package com.codementor.question.repository.QuestionConstraint;
 
 
 import com.codementor.question.entity.QuestionConstraint;

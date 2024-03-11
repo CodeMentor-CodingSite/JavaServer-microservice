@@ -2,7 +2,7 @@ package com.codementor.question.service;
 
 import com.codementor.question.dto.PlanDto;
 import com.codementor.question.entity.Plan;
-import com.codementor.question.repository.PlanRepository;
+import com.codementor.question.repository.Plan.PlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

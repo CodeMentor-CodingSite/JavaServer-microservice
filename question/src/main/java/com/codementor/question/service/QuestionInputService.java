@@ -8,11 +8,15 @@ import com.codementor.question.dto.request.QuestionCodeInputRequest;
 import com.codementor.question.dto.request.QuestionInputRequest;
 import com.codementor.question.dto.request.TestCaseRequest;
 import com.codementor.question.entity.*;
-import com.codementor.question.enums.QuestionDifficulty;
-import com.codementor.question.repository.*;
-import jdk.jshell.spi.ExecutionControl;
+import com.codementor.question.repository.CodeExecConverter.CodeExecConverterRepositorySupport;
+import com.codementor.question.repository.ConverterMap.ConverterMapRepositorySupport;
+import com.codementor.question.repository.Language.LanguageRepositorySupport;
+import com.codementor.question.repository.Question.QuestionRepositorySupport;
+import com.codementor.question.repository.QuestionConstraint.QuestionConstraintRepository;
+import com.codementor.question.repository.QuestionLanguage.QuestionLanguageRepositorySupport;
+import com.codementor.question.repository.QuestionTestCase.QuestionTestCaseRepository;
+import com.codementor.question.repository.QuestionTestCaseDetail.QuestionTestCaseDetailRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,14 +26,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class QuestionInputService {
-    private final QuestionRepository questionRepository;
-    private final LanguageRepository languageRepository;
-    private final QuestionLanguageRepository questionLanguageRepository;
+    private final QuestionRepositorySupport questionRepositorySupport;
+    private final LanguageRepositorySupport languageRepositorySupport;
+    private final QuestionLanguageRepositorySupport questionLanguageRepositorySupport;
     private final QuestionTestCaseRepository questionTestCaseRepository;
     private final QuestionTestCaseDetailRepository questionTestCaseDetailRepository;
-    private final CodeExecConverterRepository codeExecConverterRepository;
+    private final CodeExecConverterRepositorySupport codeExecConverterRepositorySupport;
     private final QuestionConstraintRepository questionConstraintRepository;
-    private final ConverterMapRepository converterMapRepository;
+    private final ConverterMapRepositorySupport converterMapRepositorySupport;
 
     /**
      * 문제 입력
@@ -38,7 +42,7 @@ public class QuestionInputService {
      */
     @Transactional
     public Long questionInput(QuestionInputRequest request) {
-        Question savedQuestion = questionRepository.save(Question.from(request));
+        Question savedQuestion = questionRepositorySupport.save(Question.from(request));
         for (int i = 0; i < request.getQuestionConstraintContents().size(); i++) {
             questionConstraintRepository.save(QuestionConstraint.from(savedQuestion, request.getQuestionConstraintContents().get(i)));
         }
@@ -52,7 +56,7 @@ public class QuestionInputService {
      */
     @Transactional
     public Long testCaseInput(TestCaseRequest testCaseRequest) {
-        var question = questionRepository.findById((long) testCaseRequest.getQuestionId()).orElseThrow();
+        var question = questionRepositorySupport.findById((long) testCaseRequest.getQuestionId()).orElseThrow();
         var savedQuestionTestCase = questionTestCaseRepository.save(QuestionTestCase.from(question, testCaseRequest));
 
         // 각 TestCaseDetail에 ConverterMap 저장
@@ -66,7 +70,7 @@ public class QuestionInputService {
             ArrayList<Long> converterIds = testCaseRequest.getTestCaseDetailDTOs().get(i).getConverterIds();
 
             for (Long converterId : converterIds) { // // 각 TestCaseDetailId와 ConverterId를 ConverterMap에 저장
-                converterMapRepository.save(ConverterMap.from(questionTestCaseDetail, codeExecConverterRepository.findById(converterId).orElseThrow()));
+                converterMapRepositorySupport.save(ConverterMap.from(questionTestCaseDetail, codeExecConverterRepositorySupport.findById(converterId).orElseThrow()));
             }
         }
         return savedQuestionTestCase.getId();
@@ -79,8 +83,8 @@ public class QuestionInputService {
      */
     @Transactional
     public Long converterInput(ConverterInputRequest converterInputRequest) {
-        var languageEntity = languageRepository.findByType(converterInputRequest.getLanguageType()).orElseThrow();
-        return codeExecConverterRepository.save(CodeExecConverter.from(languageEntity, converterInputRequest)).getId();
+        var languageEntity = languageRepositorySupport.findByType(converterInputRequest.getLanguageType()).orElseThrow();
+        return codeExecConverterRepositorySupport.save(CodeExecConverter.from(languageEntity, converterInputRequest)).getId();
     }
 
     /**
@@ -90,16 +94,16 @@ public class QuestionInputService {
      */
     @Transactional
     public Long questionCodeInput(QuestionCodeInputRequest questionCodeInputRequest) {
-        var question = questionRepository.findById(questionCodeInputRequest.getQuestionId()).orElseThrow(
+        var question = questionRepositorySupport.findById(questionCodeInputRequest.getQuestionId()).orElseThrow(
                 () -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
-        var language = languageRepository.findByType(questionCodeInputRequest.getLanguageType()).orElseThrow(
+        var language = languageRepositorySupport.findByType(questionCodeInputRequest.getLanguageType()).orElseThrow(
                 () -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
 
-        Optional<QuestionLanguage> foundQuestionLanguage = questionLanguageRepository.findByQuestionAndLanguage(question, language);
+        Optional<QuestionLanguage> foundQuestionLanguage = questionLanguageRepositorySupport.findByQuestionAndLanguage(question, language);
         if (foundQuestionLanguage.isPresent()) {
             throw new CodeMentorException(ErrorEnum.RECORD_ALREADY_EXISTS);
         }
-        return questionLanguageRepository.save(QuestionLanguage.from(question, language, questionCodeInputRequest)).getId();
+        return questionLanguageRepositorySupport.save(QuestionLanguage.from(question, language, questionCodeInputRequest)).getId();
     }
 
 }

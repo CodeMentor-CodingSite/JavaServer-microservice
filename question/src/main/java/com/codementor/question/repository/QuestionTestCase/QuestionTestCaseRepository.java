@@ -1,4 +1,4 @@
-package com.codementor.question.repository;
+package com.codementor.question.repository.QuestionTestCase;
 
 
 import com.codementor.question.entity.Question;
@@ -8,5 +8,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface QuestionTestCaseRepository extends JpaRepository<QuestionTestCase, Long> {
-    List<QuestionTestCase> findByQuestion(Question question);
 }

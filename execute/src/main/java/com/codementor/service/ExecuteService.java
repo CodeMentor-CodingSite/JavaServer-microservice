@@ -7,7 +7,7 @@ import com.codementor.dto.external.UserSolvedQuestionIdList;
 import com.codementor.dto.response.UserSolvedQuestionIdAndTitleAndTimeResponse;
 import com.codementor.dto.response.UserSubmitHistoryResponse;
 import com.codementor.entity.ExecuteUsercode;
-import com.codementor.repository.ExecuteUsercodeRepository;
+import com.codementor.repository.ExecuteUsercode.ExecuteUsercodeRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
@@ -25,7 +25,7 @@ public class ExecuteService {
 
     private final RequestToServer requestToServer;
 
-    private final ExecuteUsercodeRepository executeUsercodeRepository;
+    private final ExecuteUsercodeRepositorySupport executeUsercodeRepositorySupport;
 
     /**
      * 유저가 푼 문제 수와 제출한 문제 수를 가져온다.
@@ -34,7 +34,7 @@ public class ExecuteService {
      * @return 유저가 푼 문제 수와 제출한 문제 수
      */
     public UserSolvedRatioSubmitDto getUserSolvedRatioSubmit(Long userId) {
-        return UserSolvedRatioSubmitDto.from(executeUsercodeRepository.findAllByUserId(userId));
+        return UserSolvedRatioSubmitDto.from(executeUsercodeRepositorySupport.findAllByUserId(userId));
     }
 
     /**
@@ -79,7 +79,7 @@ public class ExecuteService {
     }
 
     public UserUsedLanguagesDtoList getUserUsedLanguages(Long userId) {
-        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
+        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepositorySupport.findAllByUserId(userId);
         Map<String, Integer> collectedLanguages = executeUsercodeList.stream()
                 .filter(ExecuteUsercode::getIsCorrect)
                 .sorted(Comparator.comparing(ExecuteUsercode::getUserLanguage))
@@ -105,7 +105,7 @@ public class ExecuteService {
     public Page<UserSolvedQuestionIdAndTitleAndTimeResponse> userSolvedQuestionIdAndTitleAndTime(Long userId, int page, int size, String difficulty) {
         Pageable pageableWithSort = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timeStamp"));
         List<UserSolvedQuestionIdAndTitleAndTimeResponse> responseList = new ArrayList<>();
-        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserIdAndIsCorrect(userId, true);
+        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepositorySupport.findAllByUserIdAndIsCorrect(userId, true);
         for (var executeUsercode : executeUsercodeList) {
             responseList.add(UserSolvedQuestionIdAndTitleAndTimeResponse.of(executeUsercode, difficulty));
         }
@@ -120,12 +120,12 @@ public class ExecuteService {
     }
 
     public UserSubmitHistoryResponse getUserSubmitHistory(Long userId, Long usercodeId) {
-        return UserSubmitHistoryResponse.of(executeUsercodeRepository.findByIdAndUserId(usercodeId, userId));
+        return UserSubmitHistoryResponse.of(executeUsercodeRepositorySupport.findByIdAndUserId(usercodeId, userId));
     }
 
     public Page<UserSubmitHistoryResponse> userSubmitHistory(Long userId, int page, int size) {
         List<UserSubmitHistoryResponse> responseList = new ArrayList<>();
-        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
+        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepositorySupport.findAllByUserId(userId);
         for (var executeUsercode : executeUsercodeList) {
             responseList.add(UserSubmitHistoryResponse.of(executeUsercode));
         }
@@ -141,13 +141,13 @@ public class ExecuteService {
     }
 
     public List<ExecuteUsercodeDto> allUsercodeHistory(Long userId, Long questionId) {
-        return executeUsercodeRepository.findAllByUserIdAndQuestionId(userId, questionId).stream()
+        return executeUsercodeRepositorySupport.findAllByUserIdAndQuestionId(userId, questionId).stream()
                 .map(ExecuteUsercodeDto::from)
                 .collect(Collectors.toList());
     }
 
     public Page<ExecuteAllUsercodeDto> getAllHistory(Long questionId, int page, int size) {
-        List<ExecuteAllUsercodeDto> executeUsercodeDtos = executeUsercodeRepository.findAllByQuestionId(questionId).stream()
+        List<ExecuteAllUsercodeDto> executeUsercodeDtos = executeUsercodeRepositorySupport.findAllByQuestionId(questionId).stream()
                 .map(ExecuteAllUsercodeDto::from)
                 .sorted(Comparator.comparing(ExecuteAllUsercodeDto::getTimeStamp).reversed())
                 .collect(Collectors.toList());
@@ -159,7 +159,7 @@ public class ExecuteService {
 
     //풀었던 문제 엔터티들의 Id를 가져온다.
     private List<Long> getSolvedExecuteUserCodeList(Long userId) {
-        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepository.findAllByUserId(userId);
+        List<ExecuteUsercode> executeUsercodeList = executeUsercodeRepositorySupport.findAllByUserId(userId);
         Set<Long> correctQuestionIdList = executeUsercodeList.stream()
                 .filter(ExecuteUsercode::getIsCorrect)
                 .map(ExecuteUsercode::getQuestionId)

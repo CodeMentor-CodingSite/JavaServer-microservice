@@ -6,8 +6,8 @@ import com.codementor.dto.evaluation.EvalQuestionTestCaseDto;
 import com.codementor.dto.evaluation.EvaluationDto;
 import com.codementor.entity.ExecuteResult;
 import com.codementor.entity.ExecuteUsercode;
-import com.codementor.repository.ExecuteResultRepository;
-import com.codementor.repository.ExecuteUsercodeRepository;
+import com.codementor.repository.ExecuteResult.ExecuteResultRepository;
+import com.codementor.repository.ExecuteUsercode.ExecuteUsercodeRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCodeExecutionResponseConsumer {
     private final SseConnectionService sseConnectionService;
 
-    private final ExecuteUsercodeRepository executeUsercodeRepository;
+    private final ExecuteUsercodeRepositorySupport executeUsercodeRepositorySupport;
     private final ExecuteResultRepository executeResultRepository;
 
     /**
@@ -29,7 +29,7 @@ public class UserCodeExecutionResponseConsumer {
      */
     @Transactional
     public void receivedEvaluationResult(EvaluationDto evaluationDto) {
-        ExecuteUsercode executeUsercode = executeUsercodeRepository.findById(evaluationDto.getExecuteUserCodeId())
+        ExecuteUsercode executeUsercode = executeUsercodeRepositorySupport.findById(evaluationDto.getExecuteUserCodeId())
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         if (evaluationDto.getGptEvaluation() == null){
             executeUsercode.updateWithIsCorrectAndExecuteTimeWith(evaluationDto); // 1.
@@ -40,6 +40,6 @@ public class UserCodeExecutionResponseConsumer {
         } else {
             executeUsercode.updateWithGptEvaluationWith(evaluationDto); // 3.
         }
-        executeUsercodeRepository.save(executeUsercode);
+        executeUsercodeRepositorySupport.save(executeUsercode);
     }
 }

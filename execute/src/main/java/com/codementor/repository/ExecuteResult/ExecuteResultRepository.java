@@ -1,4 +1,4 @@
-package com.codementor.repository;
+package com.codementor.repository.ExecuteResult;
 
 import com.codementor.entity.ExecuteResult;
 import org.springframework.data.jpa.repository.JpaRepository;

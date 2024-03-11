@@ -6,7 +6,7 @@ import com.codementor.dto.evaluation.EvalQuestionRequest;
 import com.codementor.dto.evaluation.EvaluationDto;
 import com.codementor.dto.request.UserCodeExecutionRequest;
 import com.codementor.entity.ExecuteUsercode;
-import com.codementor.repository.ExecuteUsercodeRepository;
+import com.codementor.repository.ExecuteUsercode.ExecuteUsercodeRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class UserCodeExecutionRequestProducer {
     private final RequestToServer requestToServer;
     private final SendToKafka sendToKafka;
 
-    private final ExecuteUsercodeRepository executeUsercodeRepository;
+    private final ExecuteUsercodeRepositorySupport executeUsercodeRepositorySupport;
 
     private static final String TOPIC_NAME = "usercode.request.topic.v1";
     private static final String GROUP_ID = "usercode.request.group.v1";
@@ -44,7 +44,7 @@ public class UserCodeExecutionRequestProducer {
                 questionDataFromQuestionServerUrl,
                 EvalQuestionRequest.from(userCodeExecutionRequest), // 1.
                 EvaluationDto.class);
-        var executeUsercodeId = executeUsercodeRepository.save(ExecuteUsercode.from(userCodeExecutionRequest, evaluationDto)).getId(); // 2
+        var executeUsercodeId = executeUsercodeRepositorySupport.save(ExecuteUsercode.from(userCodeExecutionRequest, evaluationDto)).getId(); // 2
         System.out.println("Sending to Kafka");
         sendToKafka.sendData(TOPIC_NAME, evaluationDto.updatedWith(userCodeExecutionRequest, executeUsercodeId)); // 3, 4.
     }
