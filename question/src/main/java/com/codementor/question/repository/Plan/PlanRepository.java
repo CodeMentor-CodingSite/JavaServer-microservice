@@ -1,4 +1,4 @@
-package com.codementor.question.repository;
+package com.codementor.question.repository.Plan;
 
 import com.codementor.question.entity.Plan;
 import org.springframework.data.jpa.repository.JpaRepository;

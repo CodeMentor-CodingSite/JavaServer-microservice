@@ -6,8 +6,8 @@ import com.codementor.user.core.exception.ErrorEnum;
 import com.codementor.user.dto.*;
 import com.codementor.user.entity.User;
 import com.codementor.user.entity.UserLike;
-import com.codementor.user.repository.UserLikeRepository;
-import com.codementor.user.repository.UserRepository;
+import com.codementor.user.repository.userlike.UserLikeRepositorySupport;
+import com.codementor.user.repository.user.UserRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final UserLikeRepository userLikeRepository;
+    private final UserRepositorySupport userRepositorySupport;
+    private final UserLikeRepositorySupport userLikeRepositorySupport;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
@@ -31,14 +31,14 @@ public class UserService {
 
         User user = UserCreateDTO.toEntity(userCreateDTO).encodePassword(passwordEncoder);
 
-        userRepository.save(user);
+        userRepositorySupport.save(user);
 
         return "Success";
     }
 
     @Transactional
     public TokenDTO doLogin(UserLoginDTO userLoginDTO) {
-        User responseUser = userRepository.findByEmail(userLoginDTO.getEmail())
+        User responseUser = userRepositorySupport.findByEmail(userLoginDTO.getEmail())
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.INVALID_LOGIN_EMAIL));
 
         if (!responseUser.isMatchPassword(userLoginDTO.getPassword(), passwordEncoder)) {
@@ -50,7 +50,7 @@ public class UserService {
 
     @Transactional
     public UserProfileDTO getUser(Long userId) {
-        User foundUser = userRepository.findById(userId)
+        User foundUser = userRepositorySupport.findById(userId)
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         return UserProfileDTO.builder()
@@ -60,12 +60,12 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+        userRepositorySupport.deleteById(userId);
     }
 
     @Transactional
     public TokenDTO reissueToken(Long id) {
-        User foundUser = userRepository.findById(id)
+        User foundUser = userRepositorySupport.findById(id)
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         return TokenDTO.builder()
@@ -84,7 +84,7 @@ public class UserService {
 
     @Transactional
     public String updateUser(UserUpdateDTO userUpdateDTO, Long id) {
-        User foundUser = userRepository.findById(id)
+        User foundUser = userRepositorySupport.findById(id)
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
         String nickname = userUpdateDTO.getNickname();
@@ -99,18 +99,18 @@ public class UserService {
     }
 
     public String toggleLike(Long questionId, Long userId) {
-        User foundUser = userRepository.findById(userId)
+        User foundUser = userRepositorySupport.findById(userId)
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.NOT_FOUND_USER_BY_USER_ID));
 
-        Optional<UserLike> userLike = userLikeRepository.findOneByQuestionIdAndUserId(questionId, foundUser.getId());
+        Optional<UserLike> userLike = userLikeRepositorySupport.findOneByQuestionIdAndUserId(questionId, foundUser.getId());
 
         if (userLike.isEmpty()) {
-            userLikeRepository.save(UserLike.builder()
+            userLikeRepositorySupport.save(UserLike.builder()
                     .questionId(questionId)
                     .user(foundUser)
                     .build());
         } else {
-            userLikeRepository.delete(userLike.get());
+            userLikeRepositorySupport.delete(userLike.get());
         }
 
         return "Success";
@@ -127,12 +127,12 @@ public class UserService {
     }
 
     private void checkExistedEmail(String email) {
-        if (userRepository.existsByEmail(email))
+        if (userRepositorySupport.existsByEmail(email))
             throw new CodeMentorException(ErrorEnum.EXIST_EMAIL);
     }
 
     private void checkExistedNickname(String nickname) {
-        if (userRepository.existsByNickname(nickname))
+        if (userRepositorySupport.existsByNickname(nickname))
             throw new CodeMentorException(ErrorEnum.EXIST_NICKNAME);
     }
 

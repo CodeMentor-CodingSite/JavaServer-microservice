@@ -4,8 +4,8 @@ import com.codementor.user.core.util.RequestToServer;
 import com.codementor.user.dto.external.UserPlanDto;
 import com.codementor.user.entity.User;
 import com.codementor.user.entity.UserPlan;
-import com.codementor.user.repository.UserPlanRepository;
-import com.codementor.user.repository.UserRepository;
+import com.codementor.user.repository.userplan.UserPlanRepositorySupport;
+import com.codementor.user.repository.user.UserRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,23 +22,23 @@ public class PlanService {
 
     private final RequestToServer requestToServer;
 
-    private final UserPlanRepository userPlanRepository;
-    private final UserRepository userRepository;
+    private final UserPlanRepositorySupport userPlanRepositorySupport;
+    private final UserRepositorySupport userRepositorySupport;
 
     public String toggleSubscribePlan(Long userId, Long planId){
-        var userPlan = userPlanRepository.findByUserIdAndPlanId(userId, planId);
+        var userPlan = userPlanRepositorySupport.findByUserIdAndPlanId(userId, planId);
         if(userPlan.isEmpty()){
-            User user = userRepository.findById(userId).orElseThrow();
-            userPlanRepository.save(UserPlan.subscribe(user, planId));
+            User user = userRepositorySupport.findById(userId).orElseThrow();
+            userPlanRepositorySupport.save(UserPlan.subscribe(user, planId));
             return "Subscribed successfully";
         } else {
-            userPlanRepository.deleteById(userPlan.get().getId());
+            userPlanRepositorySupport.deleteById(userPlan.get().getId());
             return "Unsubscribed successfully";
         }
     }
 
     public List<UserPlanDto> getPlan(Long userId){
-        List<Long> userPlanIds = userPlanRepository.findAllByUserId(userId)
+        List<Long> userPlanIds = userPlanRepositorySupport.findAllByUserId(userId)
                 .stream()
                 .map(UserPlan::getPlanId)
                 .collect(Collectors.toList());

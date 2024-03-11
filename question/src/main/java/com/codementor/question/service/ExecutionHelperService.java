@@ -3,12 +3,13 @@ package com.codementor.question.service;
 import com.codementor.question.dto.external.*;
 import com.codementor.question.entity.*;
 import com.codementor.question.enums.QuestionDifficulty;
-import com.codementor.question.repository.*;
+import com.codementor.question.repository.Language.LanguageRepositorySupport;
+import com.codementor.question.repository.Plan.PlanRepository;
+import com.codementor.question.repository.Question.QuestionRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,16 +20,16 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ExecutionHelperService {
-    private final QuestionRepository questionRepository;
-    private final LanguageRepository languageRepository;
+    private final QuestionRepositorySupport questionRepositorySupport;
+    private final LanguageRepositorySupport languageRepositorySupport;
     private final PlanRepository planRepository;
 
 
     public EvaluationDto createEvaluationDto(Long questionId, String userLanguage) {
 
-        Language language = languageRepository.findByType(userLanguage)
+        Language language = languageRepositorySupport.findByType(userLanguage)
                 .orElseThrow(() -> new EntityNotFoundException("Language with type " + userLanguage + " not found"));
-        Question question = questionRepository.findById(questionId)
+        Question question = questionRepositorySupport.findById(questionId)
                 .orElseThrow(() -> new EntityNotFoundException("Question with ID " + questionId + " not found"));
 
         List<String> questionConstraints = question.getQuestionConstraints().stream()
@@ -71,17 +72,17 @@ public class ExecutionHelperService {
     }
 
     public QuestionDifficultyCounts getAllQuestionsDifficultyCounts(){
-        List<Question> questionsList = questionRepository.findAll();
+        List<Question> questionsList = questionRepositorySupport.findAll();
         return QuestionDifficultyCounts.fromQuestionList(questionsList);
     }
 
     public UserSolvedRatioTotalDto getUserSolvedRatioSubmitDto(UserSolvedRatioTotalDto req){
-        return req.updatedWith(req, questionRepository.findAll());
+        return req.updatedWith(req, questionRepositorySupport.findAll());
     }
 
     public UserSolvedCategoryDtoList getUserSolvedCategoryQuestionList(UserSolvedQuestionIdList req){
         Set<Long> problemIdSet = new HashSet<>(req.getProblemIdList());
-        List<Question> questionsList = questionRepository.findAllById(problemIdSet);
+        List<Question> questionsList = questionRepositorySupport.findAllById(problemIdSet);
         List<UserSolvedCategoryDto> result = questionsList.stream()
                 .map(question -> new UserSolvedCategoryDto().from(question))
                 .collect(Collectors.toList());
@@ -93,7 +94,7 @@ public class ExecutionHelperService {
     public List<UserSolvedQuestionIdAndTitleAndTimeResponse> getQuestionNameFromId(List<UserSolvedQuestionIdAndTitleAndTimeResponse> request) {
         List<UserSolvedQuestionIdAndTitleAndTimeResponse> newResponse = new ArrayList<>();
         for (var req : request) {
-            Optional<Question> question = questionRepository.findByIdAndDifficulty(req.getQuestionId(), QuestionDifficulty.valueOf(req.getDifficulty()));
+            Optional<Question> question = questionRepositorySupport.findByIdAndDifficulty(req.getQuestionId(), QuestionDifficulty.valueOf(req.getDifficulty()));
             if (question.isPresent()){
                 newResponse.add(UserSolvedQuestionIdAndTitleAndTimeResponse.of(req, question));
             }
@@ -103,7 +104,7 @@ public class ExecutionHelperService {
 
     public List<UserSubmitHistoryResponse> getUserSubmitHistory(List<UserSubmitHistoryResponse> request){
         for (var req : request) {
-            Optional<Question> question = questionRepository.findById(req.getQuestionId());
+            Optional<Question> question = questionRepositorySupport.findById(req.getQuestionId());
             if (question.isPresent()){
                 req.setQuestionName(question.get().getTitle());
             }

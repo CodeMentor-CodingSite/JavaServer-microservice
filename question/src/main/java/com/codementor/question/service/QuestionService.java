@@ -8,12 +8,10 @@ import com.codementor.question.dto.response.QuestionDetailDtoResponse;
 import com.codementor.question.dto.QuestionDto;
 import com.codementor.question.dto.response.QuestionInitCodeResponse;
 import com.codementor.question.entity.Question;
-import com.codementor.question.entity.QuestionLanguage;
-import com.codementor.question.enums.UserSolvedStatus;
 import com.codementor.question.mapper.QuestionMapper;
-import com.codementor.question.repository.PlanMapRepository;
-import com.codementor.question.repository.PlanRepository;
-import com.codementor.question.repository.QuestionRepository;
+import com.codementor.question.repository.PlanMap.PlanMapRepository;
+import com.codementor.question.repository.Plan.PlanRepository;
+import com.codementor.question.repository.Question.QuestionRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +31,7 @@ public class QuestionService {
 
     private final RequestToServer requestToServer;
 
-    private final QuestionRepository questionRepository;
+    private final QuestionRepositorySupport questionRepositorySupport;
     private final PlanRepository planRepository;
     private final PlanMapRepository planMapRepository;
 
@@ -52,7 +45,7 @@ public class QuestionService {
      * @return 페이지네이션된 문제 dto
      */
     public Page<QuestionDto> getPaginatedQuestionDtos(Long userId, Pageable pageable){
-        Page<Question> questionPage = questionRepository.findAll(pageable);
+        Page<Question> questionPage = questionRepositorySupport.findAll(pageable);
 
         var getUserQuestionsStatusUrl = executeUrl + "/api/external/question/get/user/status";
         var userQuestionsStatus = requestToServer.postDataToServer(getUserQuestionsStatusUrl, userId, UserQuestionsStatus.class);
@@ -77,7 +70,7 @@ public class QuestionService {
      * @return 문제 dto
      */
     public QuestionDetailDtoResponse getQuestionById(Long questionId) {
-        return QuestionMapper.toDto(questionRepository.findById(questionId).orElseThrow(
+        return QuestionMapper.toDto(questionRepositorySupport.findById(questionId).orElseThrow(
                 () -> new RuntimeException("Question not found")));
     }
 
@@ -88,7 +81,7 @@ public class QuestionService {
      * @return 초기 코드
      */
     public QuestionInitCodeResponse getQuestionInitialCode(Long questionId, String language) {
-        var question = questionRepository.findById(questionId)
+        var question = questionRepositorySupport.findById(questionId)
                 .orElseThrow(() -> new CodeMentorException(ErrorEnum.RECORD_NOT_FOUND));
         var questionLanguage = question.getQuestionLanguages().stream()
                 .filter(ql -> ql.getLanguage()!= null && language.equals(ql.getLanguage().getType()))
